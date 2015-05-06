@@ -16,8 +16,7 @@ $(SUBDIR)/TLSStack.cpp \
 $(SUBDIR)/Topics.cpp \
 $(SUBDIR)/UDPStack.cpp \
 $(SUBDIR)/XXXXXStack.cpp \
-$(SUBDIR)/ZBStack.cpp \ 
-$(SUBDIR)/Test.cpp 
+$(SUBDIR)/ZBStack.cpp
 
 CXX := g++
 CPPFLAGS += 
