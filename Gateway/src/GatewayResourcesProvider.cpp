@@ -32,9 +32,9 @@
  *      Author: Tomoaki YAMAGUCHI
  *     Version: 0.0.0
  */
-#include "GatewayResourcesProvider.h"
 #include "GatewayDefines.h"
 #include "lib/ProcessFramework.h"
+#include "GatewayResourcesProvider.h"
 #include "ErrorMessage.h"
 #include <iostream>
 #include <stdio.h>

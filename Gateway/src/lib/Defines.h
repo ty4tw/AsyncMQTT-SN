@@ -62,7 +62,7 @@
       Debug Print functions
  ==================================*/
 #ifdef  DEBUG_NWSTACK
-  #define D_NWSTACK(...)  printf(__VA_ARGS__)
+  #define D_NWSTACK(...) printf(__VA_ARGS__)
 #else
   #define D_NWSTACK(...)
 #endif

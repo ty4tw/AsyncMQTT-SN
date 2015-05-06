@@ -43,6 +43,7 @@ Topic::Topic(){
     _topicId = 0;
     _topicType = 0;
     _callback = 0;
+    _next = 0;
 }
 
 
@@ -220,5 +221,3 @@ Topic* Topics::match(string* topic){
 	}
 	return 0;
 }
-
-

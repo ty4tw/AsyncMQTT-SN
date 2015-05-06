@@ -110,7 +110,7 @@ void GatewayControlTask::run(){
 
 	advertiseTimer.start(keepAlive * 1000UL);
 
-	LOGWRITE("%s TomyGateway started. %s %s\n", currentDateTime(),GATEWAY_NETWORK,GATEWAY_VERSION);
+	LOGWRITE("%s AsyncTomyGateway started. %s %s\n", currentDateTime(),GATEWAY_NETWORK,GATEWAY_VERSION);
 
 
 	while(true){
@@ -164,7 +164,6 @@ void GatewayControlTask::run(){
 				sendUnixTimer.stop();
 			}
 		}
-
 		/*------   Check  SEARCHGW & send GWINFO      ---------*/
 		else if(ev->getEventType() == EtBroadcast){
 			MQTTSnMessage* msg = ev->getMqttSnMessage();
@@ -770,9 +769,7 @@ void GatewayControlTask::handleSnRegister(Event* ev, ClientNode* clnode, MQTTSnM
 	snMsg->absorb(msg);
 
 	respMsg->setMsgId(snMsg->getMsgId());
-
 	uint16_t tpId = clnode->getTopics()->add(snMsg->getTopicName())->getTopicId();
-
 	respMsg->setTopicId(tpId);
 	respMsg->setReturnCode(MQTTSN_RC_ACCEPTED);
 

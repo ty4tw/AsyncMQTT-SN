@@ -77,15 +77,12 @@ class Topics {
 public:
       Topics();
       ~Topics();
-      //uint16_t  createTopic(string* topic);
       Topic*    add(string* topic, uint16_t id = 0, uint8_t type = MQTTSN_TOPIC_TYPE_NORMAL, TopicCallback callback = 0);
       uint16_t  getTopicId(string* topic);
       uint16_t  getNextTopicId();
       Topic*    getTopic(uint16_t topicId, uint8_t topicType);
       Topic*    getTopic(string* topic);
       Topic*    match(string* topic);
-      bool     clearTopic(string* topic);
-
 private:
     uint16_t _nextTopicId;
     Topic*   _first;

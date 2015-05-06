@@ -123,30 +123,30 @@ void ClientRecvTask::run(){
 #ifdef NETWORK_XXXXX
 	_network = _res->getNetwork();
 #endif
+
 	if(_network->initialize(config) < 0){
 		THROW_EXCEPTION(ExFatal, ERRNO_APL_01, "can't open the client port.");  // ABORT
 	}
 
 	uint8_t* recvMsg;
-	int len = 0;
+	int len;
 
 	while(true){
 		bool eventSetFlg = true;
-
 		recvMsg = _network->Network::getResponce(&len);
-		if(len){
+		if (recvMsg != 0){
+			uint8_t offset = 0;
+			if (recvMsg[0] == 0x01){
+				offset = 3;
+			}else{
+				offset = 1;
+			}
+
 			Event* ev = new Event();
 			ClientNode* clnode = _res->getClientList()->getClient(_network->getAddrMsb(),_network->getAddrLsb(),
-					                                              _network->getAddr16());
-			uint8_t offset = 0;
+																  _network->getAddr16());
+
 			if(!clnode){
-
-				if (recvMsg[0] == 0x01){
-					offset = 3;
-				}else{
-					offset = 1;
-				}
-
 				if(*(recvMsg + offset) == MQTTSN_TYPE_CONNECT){
 
 				#ifdef NETWORK_XBEE

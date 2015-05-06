@@ -125,7 +125,7 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
     return false;   //Timeout
 }
 
-void Network::readApiFrame(){
+void Network::readApiFrame(void){
 
     if (_available || _errorCode){
       _available = _errorCode = _pos = 0;
