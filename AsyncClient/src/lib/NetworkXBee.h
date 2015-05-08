@@ -114,6 +114,7 @@ public:
     bool send(unsigned char b);
     bool recv(unsigned char* b);
     bool checkRecvBuf();
+    void flush();
 private:
     Stream* _serialDev;
 };
@@ -132,6 +133,7 @@ public:
     bool send(unsigned char b);
     bool recv(unsigned char* b);
     bool checkRecvBuf();
+    void flush();
 private:
     int _fd;  // file descriptor
     struct termios _tio;
@@ -165,7 +167,7 @@ private:
     void sendByte(uint8_t);
     void sendAddr(uint8_t* addr, uint8_t len, uint8_t* checksum);
 
-    uint8_t     _responseData[MQTTSN_MAX_PACKET_SIZE];
+    uint8_t     _responseData[MQTTSN_MAX_PACKET_SIZE + 1];
     uint8_t*    _mqttsnMsg;
     int         _respLen;
     Timer       _tm;

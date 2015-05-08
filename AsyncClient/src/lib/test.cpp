@@ -38,61 +38,11 @@
 #include "RegisterManager.h"
 #include "TopicTable.h"
 #include <stdio.h>
-#include <map>
 
 using namespace std;
 using namespace tomyAsyncClient;
 
-typedef map<uint16_t, uint16_t> ACKMAP;
-
 void test( ){
-
-	/*
-	printf("Test RegisterQue\n");
-	RegisterManager que;
-
-	const char* topic1 = "topic/1/tomy";
-	const char* topic2 = "topic/2/tomy";
-	const char* topic3 = "topic/+";
-	const char* topic4 = "topic/+/tomy";
-	const char* topic5 = "topic/5/tomy";
-
-	//que.add(topic1, (uint16_t)1);
-	//que.add(topic2, (uint16_t)2);
-	//que.add(topic3, (uint16_t)3);
-	//que.add(topic4, (uint16_t)4);
-
-	printf("Topic %s\n",que.getTopic(1));
-	printf("Topic %s\n",que.getTopic(2));
-	printf("Topic %s\n",que.getTopic(3));
-	printf("Topic %s\n",que.getTopic(4));
-	printf("Topic %s\n",que.getTopic(5));
-
-	//que.remove(3);
-	printf("Topic %s\n",que.getTopic(1));
-	printf("Topic %s\n",que.getTopic(2));
-	printf("Topic %s\n",que.getTopic(3));
-	printf("Topic %s\n",que.getTopic(4));
-	printf("Topic %s\n",que.getTopic(5));
-
-	printf("Test TopicTable\n");
-
-	TopicTable topicTbl;
-	Topic* tp;
-
-	topicTbl.add(topic1,1);
-	topicTbl.add(topic2,2);
-	topicTbl.add(topic3,3);
-	topicTbl.add(topic4,4);
-
-	printf("TopicId %d\n",topicTbl.getTopicId(topic1));
-	printf("TopicId %d\n",topicTbl.getTopicId(topic2));
-	printf("TopicId %d\n",topicTbl.getTopicId(topic3));
-	printf("TopicId %d\n",topicTbl.getTopicId(topic4));
-
-	tp = topicTbl.match(topic5);
-	printf("Topic='%s'\n",topicTbl.getTopicName(tp));
-	*/
 
 
 }

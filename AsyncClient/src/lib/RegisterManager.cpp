@@ -172,7 +172,7 @@ RegQueElement* RegisterManager::getElement(uint16_t msgId){
 }
 
 
-void RegisterManager::registerTopic(const char* topicName){
+void RegisterManager::registerTopic(char* topicName){
 	RegQueElement* elm = getElement(topicName);
 	if (elm == 0){
 		uint16_t msgId = theClient->getGwProxy()->getNextMsgId();
@@ -183,18 +183,33 @@ void RegisterManager::registerTopic(const char* topicName){
 
 void RegisterManager::responceRegAck(uint16_t msgId, uint16_t topicId){
 	const char* topicName = getTopic(msgId);
-	uint8_t topicType = strlen(topicName) > 2 ? MQTTSN_TOPIC_TYPE_NORMAL : MQTTSN_TOPIC_TYPE_SHORT;
-	theClient->getGwProxy()->getTopicTable()->setTopicId(topicName, topicId, topicType);  // Add Topic to TopicTable
+	uint8_t topicType = strlen((char*)topicName) > 2 ? MQTTSN_TOPIC_TYPE_NORMAL : MQTTSN_TOPIC_TYPE_SHORT;
+	theClient->getGwProxy()->getTopicTable()->setTopicId((char*)topicName, topicId, topicType);  // Add Topic to TopicTable
 	RegQueElement* elm = getElement(msgId);
 	remove(elm);
-	theClient->getPublishManager()->sendSuspend(topicName, topicId, topicType );
+	theClient->getPublishManager()->sendSuspend((char*)topicName, topicId, topicType );
 }
 
 void RegisterManager::responceRegister(uint8_t* msg, uint16_t msglen){
-	// ToDo:
+	// *msg is terminated with 0x00 by Network::getResponce()
+	uint8_t regack[7];
+	regack[0] = 7;
+	regack[1] = MQTTSN_TYPE_REGACK;
+	memcpy(regack + 2, msg + 2, 4);
+
+	Topic* tp = theClient->getGwProxy()->getTopicTable()->match((char*)msg + 5);
+	if (tp){
+		TopicCallback callback = tp->getCallback();
+		void* topicName = calloc(strlen((char*)msg + 5) + 1, sizeof(char));
+		theClient->getGwProxy()->getTopicTable()->add((char*)topicName, 0, MQTTSN_TOPIC_TYPE_NORMAL, callback, 1);
+		regack[6] = MQTTSN_RC_ACCEPTED;
+	}else{
+		regack[6] = MQTTSN_RC_REJECTED_INVALID_TOPIC_ID;
+	}
+	theClient->getGwProxy()->writeMsg(regack);
 }
 
-uint8_t  RegisterManager::checkTimeout(){
+uint8_t  RegisterManager::checkTimeout(void){
 	RegQueElement* elm = _first;
 	RegQueElement* sav;
 	while (elm){
@@ -206,6 +221,9 @@ uint8_t  RegisterManager::checkTimeout(){
 					sav = elm->prev;
 					remove(elm);
 					elm = sav;
+				}else{
+					remove(elm);
+					break;
 				}
 			}
 		}

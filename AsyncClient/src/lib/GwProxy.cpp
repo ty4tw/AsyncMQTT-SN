@@ -97,19 +97,24 @@ void GwProxy::connect(){
 
 	while (_status != GW_CONNECTED){
 		pos = _msg;
+		memset(_msg, 0, MQTTSN_MAX_MSG_LENGTH + 1);
+
 		if (_status == GW_SEND_WILLMSG){
 			*pos++ = 2 + (uint8_t)strlen(_willMsg);
 			*pos++ = MQTTSN_TYPE_WILLMSG;
 			strcpy(pos,_willMsg);          // WILLMSG
 			_status = GW_WAIT_CONNACK;
+			writeGwMsg();
 		}else if (_status == GW_SEND_WILLTOPIC){
 			*pos++ = 3 + (uint8_t)strlen(_willTopic);
 			*pos++ = MQTTSN_TYPE_WILLTOPIC;
 			*pos++ = _qosWill | _retainWill;
 			strcpy(pos,_willTopic);        // WILLTOPIC
 			_status = GW_WAIT_WILLMSGREQ;
-		}else if (_status == GW_CONNECTING){
-			*pos++ = 6 + (uint8_t)strlen(_clientId);
+			writeGwMsg();
+		}else if (_status == GW_CONNECTING || _status == GW_DISCONNECTED){
+			uint8_t clientIdLen = uint8_t(strlen(_clientId) > 23 ? 23 : strlen(_clientId));
+			*pos++ = 6 + clientIdLen;
 			*pos++ = MQTTSN_TYPE_CONNECT;
 			pos++;
 			if (_cleanSession){
@@ -118,35 +123,28 @@ void GwProxy::connect(){
 			*pos++ = MQTTSN_PROTOCOL_ID;
 			setUint16((uint8_t*)pos, _tPing);
 			pos += 2;
-			strncpy(pos, _clientId, strlen(_clientId));
+			strncpy(pos, _clientId, clientIdLen);
 			if (_willMsg && _willTopic){
 				_msg[2] = _msg[2] | MQTTSN_FLAG_WILL;   // CONNECT
 				_status = GW_WAIT_WILLTOPICREQ;
 			}else{
 				_status = GW_WAIT_CONNACK;
 			}
+			writeGwMsg();
 		}else if (_status == GW_LOST){
           #if defined(NETWORK_XBEE) || defined(BROADCAST_ENABLE)
 			*pos++ = 3;
 			*pos++ = MQTTSN_TYPE_SEARCHGW;
 			*pos = 0;                        // SERCHGW
 			_status = GW_SEARCHING;
+			writeGwMsg();
           #else
             _status = GW_CONNECTING;
             _network.setFixedGwAddress();
 		  #endif
-		}else{
-			if (getConnectResponce() < 0){
-				_status = GW_LOST;
-			}
-			continue;
 		}
-		_retryCount = MQTTSN_RETRY_COUNT;
-		writeMsg((const uint8_t*)_msg);
-		_sendUTC = Timer::getUnixTime();
+		getConnectResponce();
 	}
-
-	_keepAliveTimer.start(_tPing);
 	return;
 }
 
@@ -159,6 +157,7 @@ int GwProxy::getConnectResponce(void){
 				writeMsg((const uint8_t*)_msg);
 				_sendUTC = Timer::getUnixTime();
 			}else{
+				_sendUTC = 0;
 				if (_status > GW_SEARCHING){
 					_status = GW_CONNECTING;
 				}else{
@@ -178,41 +177,74 @@ int GwProxy::getConnectResponce(void){
 	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_WILLMSGREQ && _status == GW_WAIT_WILLMSGREQ){
 		_status = GW_SEND_WILLMSG;
 	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_CONNACK && _status == GW_WAIT_CONNACK){
-printf("CONNACK recv\n");
 		if (_mqttsnMsg[1] == 0x00){
 			_status = GW_CONNECTED;
+			_keepAliveTimer.start(_tPing);
+			_topicTbl.clearTopic();
+			theClient->onConnect();
 		}else{
 			_status = GW_CONNECTING;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 
 void GwProxy::disconnect(uint16_t secs){
-	uint8_t msg[4];
+    _tSleep = secs;
+    _status = GW_DISCONNECTING;
     
-	msg[1] = MQTTSN_TYPE_DISCONNECT;
+	_msg[1] = MQTTSN_TYPE_DISCONNECT;
 
 	if (secs){
-		msg[0] = 4;
-		setUint16(msg + 2, secs);
-		_keepAliveTimer.start(secs);
+		_msg[0] = 4;
+		setUint16((uint8_t*) _msg + 2, secs);
 	}else{
-		msg[0] = 2;	
+		_msg[0] = 2;
 		_keepAliveTimer.stop();
 	}
-	writeMsg(msg);
+
+	_retryCount = MQTTSN_RETRY_COUNT;
+	writeMsg((const uint8_t*)_msg);
+	_sendUTC = Timer::getUnixTime();
+
+	while ( _status != GW_DISCONNECTED && _status != GW_SLEPT){
+		if (getDisconnectResponce() < 0){
+			_status = GW_LOST;
+			return;
+		}
+	}
 }
 
+int GwProxy::getDisconnectResponce(void){
+	int len = readMsg();
+
+	if (len == 0){
+		if (_sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
+			if (--_retryCount > 0){
+				writeMsg((const uint8_t*)_msg);
+				_sendUTC = Timer::getUnixTime();
+			}else{
+				_status = GW_LOST;
+				_gwId = 0;
+				return -1;
+			}
+		}
+		return 0;
+	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_DISCONNECT){
+		if (_tSleep){
+			_status = GW_SLEEPING;
+			_keepAliveTimer.start(_tSleep);
+		}else{
+			_status = GW_DISCONNECTED;
+		}
+	}
+}
 
 int GwProxy::getResponce(void){
 	int len = readMsg();
 	if (len < 0){
 		return len;   //error
-	}
-	if (len){
-		printf("Recv MQTT-SN TYPE=0x%x\n", _mqttsnMsg[0]);
 	}
 
 	if (len == 0){
@@ -248,7 +280,9 @@ int GwProxy::getResponce(void){
             _keepAliveTimer.start(_tPing);
         }
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_DISCONNECT){
-        // ToDo: DISCONNECT
+    	_status = GW_LOST;
+    	_gwAliveTimer.stop();
+    	_keepAliveTimer.stop();
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_ADVERTISE){
     	_tAdv = getUint16((const uint8_t*)(_mqttsnMsg + 2)) * 1000;
         _gwAliveTimer.start(_tAdv);
@@ -259,7 +293,7 @@ int GwProxy::getResponce(void){
 
 
 
-uint16_t GwProxy::registerTopic(const char* topicName, uint16_t topicId){
+uint16_t GwProxy::registerTopic(char* topicName, uint16_t topicId){
     if (topicId){
         // ToDo  Predefined Topic
     }else{
@@ -294,6 +328,12 @@ int GwProxy::writeMsg(const uint8_t* msg){
 	_status = GW_LOST;
 	_gwId = 0;
 	return rc;
+}
+
+void GwProxy::writeGwMsg(void){
+	_retryCount = MQTTSN_RETRY_COUNT;
+	writeMsg((const uint8_t*)_msg);
+	_sendUTC = Timer::getUnixTime();
 }
 
 int GwProxy::readMsg(void){
@@ -363,6 +403,7 @@ void GwProxy::checkPingReq(void){
 	if (_status == GW_CONNECTED && _keepAliveTimer.isTimeUp() && _pingStatus != GW_WAIT_PINGRESP){
 		_pingStatus = GW_WAIT_PINGRESP;
         _pingRetryCount = MQTTSN_RETRY_COUNT;
+
 		writeMsg((const uint8_t*)msg);
         _pingSendUTC = Timer::getUnixTime();
 	}else if (_pingStatus == GW_WAIT_PINGRESP){

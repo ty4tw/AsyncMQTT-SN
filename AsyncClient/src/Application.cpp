@@ -59,8 +59,8 @@ extern MqttsnClient* theClient;
  #ifdef NETWORK_XBEE
  XBEE_APP_CONFIG = {
     {
-    	"",     //ClientId
-        B9600,          //Baudrate
+    	"client01",     //ClientId
+        9600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         "/dev/ttyUSB0"               //Device (for linux App)
     },
@@ -108,7 +108,7 @@ const char* tpMeasure = "ty4tw/soilReg";
 #define PIN0  0    // measurement port
 #define RP   20    // resistance [K ohom]
 
-int measure(){
+int measure(void){
   int val = 0;
   //pinMode(PIN5,OUTPUT);
   //digitalWrite(PIN5,1);
@@ -132,7 +132,7 @@ int measure(){
 }
 
 
-int task1(){
+int task1(void){
   Payload* pl = new Payload(36);
   pl->set_array(9);
   pl->set_int32(30);
@@ -147,11 +147,17 @@ int task1(){
   return PUBLISH(topic1,pl,1);
 }
 
+int task2(void){
+  //DISCONNECT(0);
+  return 0;
+}
+
 /*---------------  List of task invoked by Timer ------------*/
 
 TASK_LIST = {  //TASK( const char* topic, executing duration in second),
              TASK(measure, 40),
              TASK(task1,6),
+             TASK(task2,120),
              END_OF_TASK_LIST
             };
 
@@ -161,12 +167,13 @@ TASK_LIST = {  //TASK( const char* topic, executing duration in second),
 
 int on_publish2(Payload* payload){
     //theApplication->indicatorOff();
+printf("ON_PUBLISH runs.\n");
     return 0;
 }
 
 /*------------ Link Callback to Topic -------------*/
 
-SUBSCRIBE_LIST = {//SUB(topic1, on_publish1, QOS1),
+SUBSCRIBE_LIST = {  //SUB(topic, on_publish, QoS),
                   SUB(topic2, on_publish2, 1),
                   END_OF_SUBSCRIBE_LIST
                  };
@@ -174,14 +181,14 @@ SUBSCRIBE_LIST = {//SUB(topic1, on_publish1, QOS1),
 /*------------------------------------------------------
  *            Tasks invoked by INT0 interruption
  *------------------------------------------------------*/
-void interruptCallback(){
+void interruptCallback(void){
 
 }
 
 /*------------------------------------------------------
  *            setup() function
  *------------------------------------------------------*/
- void setup(){
+ void setup(void){
 
  }
 

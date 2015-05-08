@@ -50,6 +50,7 @@
 #endif
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 using namespace tomyAsyncClient;
@@ -62,12 +63,18 @@ Topic::Topic(){
     _topicId = 0;
     _topicType = MQTTSN_TOPIC_TYPE_NORMAL;
     _next = 0;
+    _malocFlg = 0;
 }
 
 Topic::~Topic(){
-
+	if (_malocFlg){
+		free(_topicStr);
+	}
 }
 
+TopicCallback Topic::getCallback(void){
+	return _callback;
+}
 
 int Topic::execCallback(Payload* payload){
     if(_callback != 0){
@@ -92,7 +99,7 @@ uint8_t Topic::hasWildCard(uint8_t* pos){
     return 0;
 }
 
-bool Topic::isMatch(const char* topic){
+bool Topic::isMatch(char* topic){
     uint8_t pos;
 
 	if ( strlen(topic) < strlen(_topicStr)){
@@ -143,7 +150,7 @@ TopicTable::~TopicTable(){
 }
 
 
-Topic* TopicTable::getTopic(const char* topic){
+Topic* TopicTable::getTopic(char* topic){
 	Topic* p = _first;
 	while(p){
 		if (strcmp(p->_topicStr, topic) == 0){
@@ -165,7 +172,7 @@ Topic* TopicTable::getTopic(uint16_t topicId, uint8_t topicType){
 	return 0;
 }
 
-uint16_t TopicTable::getTopicId(const char* topic){
+uint16_t TopicTable::getTopicId(char* topic){
 	Topic* p = getTopic(topic);
 	if (p){
 		return p->_topicId;
@@ -174,12 +181,12 @@ uint16_t TopicTable::getTopicId(const char* topic){
 }
 
 
-const char* TopicTable::getTopicName(Topic* topic){
+char* TopicTable::getTopicName(Topic* topic){
 	return topic->_topicStr;
 }
 
 
-void TopicTable::setTopicId(const char* topic, uint16_t id, uint8_t type){
+void TopicTable::setTopicId(char* topic, uint16_t id, uint8_t type){
     Topic* tp = getTopic(topic);
     if (tp){
         tp->_topicId = id;
@@ -189,7 +196,7 @@ void TopicTable::setTopicId(const char* topic, uint16_t id, uint8_t type){
 }
 
 
-bool TopicTable::setCallback(const char* topic, TopicCallback callback){
+bool TopicTable::setCallback(char* topic, TopicCallback callback){
 	Topic* p = getTopic(topic);
 	if (p){
 		p->_callback = callback;
@@ -218,7 +225,7 @@ int TopicTable::execCallback(uint16_t  topicId, Payload* payload, uint8_t topicT
 }
 
 
-Topic* TopicTable::add(const char* topicName, uint16_t id, uint8_t type, TopicCallback callback){
+Topic* TopicTable::add(char* topicName, uint16_t id, uint8_t type, TopicCallback callback, uint8_t alocFlg){
     Topic* elm;
     if (*topicName){
 	    elm = getTopic(topicName);
@@ -236,6 +243,7 @@ Topic* TopicTable::add(const char* topicName, uint16_t id, uint8_t type, TopicCa
 		elm->_topicId = id;
         elm->_topicType = type;
 		elm->_callback = callback;
+		elm->_malocFlg = alocFlg;
 
 		if (tp == 0){
 			_first = elm;
@@ -255,7 +263,7 @@ Topic* TopicTable::add(const char* topicName, uint16_t id, uint8_t type, TopicCa
 }
 
 
-Topic* TopicTable::match(const char* topicName){
+Topic* TopicTable::match(char* topicName){
 	Topic* elm = _first;
 	while(elm){
 		if (elm->isMatch(topicName)){

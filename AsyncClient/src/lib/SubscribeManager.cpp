@@ -198,35 +198,23 @@ SubElement* SubscribeManager::getElement(uint16_t topicId, uint8_t topicType){
 }
 
 void SubscribeManager::subscribe(const char* topicName, TopicCallback onPublish, uint8_t qos){
-    SubElement* elm = getElement(topicName);
-    if (elm == 0){
-    	elm = add(MQTTSN_TYPE_SUBSCRIBE, topicName, 0, MQTTSN_TOPIC_TYPE_NORMAL, qos, onPublish, theClient->getGwProxy()->getNextMsgId());
-        send(elm);
-    }
+	SubElement* elm = add(MQTTSN_TYPE_SUBSCRIBE, topicName, 0, MQTTSN_TOPIC_TYPE_NORMAL, qos, onPublish, theClient->getGwProxy()->getNextMsgId());
+	send(elm);
 }
 
 void SubscribeManager::subscribe(uint16_t topicId, TopicCallback onPublish, uint8_t qos, uint8_t topicType){
-	SubElement* elm = getElement(topicId, topicType);
-	if (elm == 0){
-		elm = add(MQTTSN_TYPE_SUBSCRIBE, 0, topicId, topicType, qos, onPublish, theClient->getGwProxy()->getNextMsgId());
-		send(elm);
-	}
+	SubElement* elm = add(MQTTSN_TYPE_SUBSCRIBE, 0, topicId, topicType, qos, onPublish, theClient->getGwProxy()->getNextMsgId());
+	send(elm);
 }
 
 void SubscribeManager::unsubscribe(const char* topicName){
-    SubElement* elm = getElement(topicName);
-    if (elm == 0){
-        elm = add(MQTTSN_TYPE_UNSUBSCRIBE, topicName, 0, MQTTSN_TOPIC_TYPE_NORMAL, 0, 0, theClient->getGwProxy()->getNextMsgId());
-        send(elm);
-    }
+	SubElement* elm = add(MQTTSN_TYPE_UNSUBSCRIBE, topicName, 0, MQTTSN_TOPIC_TYPE_NORMAL, 0, 0, theClient->getGwProxy()->getNextMsgId());
+	send(elm);
 }
 
 void SubscribeManager::unsubscribe(uint16_t topicId, uint8_t topicType){
-	SubElement* elm = getElement(topicId, topicType);
-	if (elm == 0){
-		elm = add(MQTTSN_TYPE_UNSUBSCRIBE, 0, topicId, topicType, 0, 0, theClient->getGwProxy()->getNextMsgId());
-		send(elm);
-	}
+	SubElement* elm = add(MQTTSN_TYPE_UNSUBSCRIBE, 0, topicId, topicType, 0, 0, theClient->getGwProxy()->getNextMsgId());
+	send(elm);
 }
 
 
@@ -242,6 +230,9 @@ void  SubscribeManager::checkTimeout(void){
 					sav = elm->prev;
 					remove(elm);
 					elm = sav;
+				}else{
+					remove(elm);
+					break;
 				}
 			}
 		}
@@ -258,7 +249,7 @@ void SubscribeManager::responce(const uint8_t* msg){
         if (rc == 0){
             TopicTable* tt = theClient->getGwProxy()->getTopicTable();
             SubElement* elm = getElement(msgId);
-            tt->add(elm->topicName, topicId, elm->topicType, elm->callback);
+            tt->add((char*)elm->topicName, topicId, elm->topicType, elm->callback);
         }
         remove(getElement(msgId));
     }else{

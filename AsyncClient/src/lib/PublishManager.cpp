@@ -80,7 +80,7 @@ int PublishManager::publish(const char* topicName, Payload* payload, uint8_t qos
     if (elm->status == TOPICID_IS_READY){  
         sendPublish(elm);
     }else{
-        theClient->getGwProxy()->registerTopic(topicName, 0);
+        theClient->getGwProxy()->registerTopic((char*)topicName, 0);
     }
 	return 0;
 }
@@ -183,7 +183,7 @@ void PublishManager::responce(const uint8_t* msg, uint16_t msglen){
             elm->topicId = 0;
             elm->retryCount = MQTTSN_RETRY_COUNT;
             elm->sendUTC = 0;
-            theClient->getGwProxy()->registerTopic(elm->topicName, 0);
+            theClient->getGwProxy()->registerTopic((char*)elm->topicName, 0);
         }
     }else if (msg[0] == MQTTSN_TYPE_PUBREC){
         PubElement* elm = getElement(getUint16(msg + 1));
@@ -295,7 +295,7 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
         topicId = 0;
         elm->topicType = MQTTSN_TOPIC_TYPE_SHORT;
     }else if (strlen(topicName) > 2){
-        topicId = theClient->getTopicTable()->getTopicId(topicName);
+        topicId = theClient->getTopicTable()->getTopicId((char*)topicName);
         elm->topicType = MQTTSN_TOPIC_TYPE_NORMAL;
     }else{
 		elm->topicType = MQTTSN_TOPIC_TYPE_PREDEFINED;

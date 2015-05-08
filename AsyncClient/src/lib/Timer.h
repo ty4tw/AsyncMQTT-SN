@@ -106,6 +106,7 @@ public:
     void stop(void);
     void changeUTC(void){};
     static uint32_t getUnixTime();
+    static void setUnixTime(uint32_t utc){};
 private:
     struct timeval _startTime;
     uint32_t _millis;

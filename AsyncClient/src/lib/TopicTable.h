@@ -61,12 +61,14 @@ public:
     ~Topic();
     int      execCallback(Payload* msg);
     uint8_t  hasWildCard(uint8_t* pos);
-    bool     isMatch(const char* topic);
+    bool     isMatch(char* topic);
+    TopicCallback getCallback(void);
 private:
     uint16_t  _topicId;
     uint8_t   _topicType;
-    const char*  _topicStr;
+    char*     _topicStr;
     TopicCallback  _callback;
+    uint8_t  _malocFlg;
     Topic*    _next;
 };
 
@@ -77,16 +79,16 @@ class TopicTable {
 public:
 	TopicTable();
       ~TopicTable();
-      uint16_t  getTopicId(const char* topic);
-      const char* getTopicName(Topic* topic);
-      Topic*   getTopic(const char* topic);
+      uint16_t getTopicId(char* topic);
+      char*    getTopicName(Topic* topic);
+      Topic*   getTopic(char* topic);
       Topic*   getTopic(uint16_t topicId, uint8_t topicType = MQTTSN_TOPIC_TYPE_NORMAL);
-      void     setTopicId(const char* topic, uint16_t id, uint8_t topicType);
-      bool     setCallback(const char* topic, TopicCallback callback);
+      void     setTopicId(char* topic, uint16_t id, uint8_t topicType);
+      bool     setCallback(char* topic, TopicCallback callback);
       bool     setCallback(uint16_t topicId, uint8_t type, TopicCallback callback);
       int      execCallback(uint16_t  topicId, Payload* payload, uint8_t topicType = MQTTSN_TOPIC_TYPE_NORMAL);
-      Topic*   add(const char* topic, uint16_t id = 0, uint8_t type = MQTTSN_TOPIC_TYPE_NORMAL, TopicCallback callback = 0);
-      Topic*   match(const char* topic);
+      Topic*   add(char* topic, uint16_t id = 0, uint8_t type = MQTTSN_TOPIC_TYPE_NORMAL, TopicCallback callback = 0, uint8_t alocFlg = 0);
+      Topic*   match(char* topic);
       void     clearTopic(void);
 
 private:

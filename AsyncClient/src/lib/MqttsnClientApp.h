@@ -62,7 +62,7 @@
 /*======================================
  *         Debug Flag
  ======================================*/
-#define NW_DEBUG
+//#define NW_DEBUG
 //#define MQTTSN_DEBUG
 //#define DEBUG
 
@@ -269,5 +269,6 @@ struct UdpAppConfig{
 #define MQTTSN_RC_REJECTED_INVALID_TOPIC_ID 0x02
 #define MQTTSN_RC_REJECTED_NOT_SUPPORTED    0x03
 
+#define MQTTSN_TOPICID_PREDEFINED_TIME      0x01
 
 #endif /* MQTTSNCLIENTAPP_H_ */

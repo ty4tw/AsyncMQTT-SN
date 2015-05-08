@@ -145,6 +145,11 @@ bool SerialPort::recv(unsigned char* buf){
     }
 }
 
+
+void SerialPort::flush(void){
+    _serialDev->flush();
+}
+
 #endif /* ARDUINO */
 
 
@@ -183,23 +188,33 @@ int SerialPort::open(XBeeConfig config){
       _tio.c_cflag = _tio.c_cflag | CSTOPB ;
   }
 */
-    if (config.baudrate == B9600  ||
-        config.baudrate == B19200 ||
-        config.baudrate == B38400 ||
-        config.baudrate == B57600 ||
-        config.baudrate == B115200 ){
-        if( cfsetspeed(&_tio, config.baudrate)<0){
-            return errno;
-        }
-    }else{
-      return -1;
-    }
+  	long br;
+  	switch (config.baudrate){
+  	case 9600:
+  		br = B9600;
+  		break;
+  	case 19200:
+  		br = B19200;
+  		break;
+  	case 38400:
+  		br = B38400;
+  		break;
+  	case 57600:
+		br = B57600;
+		break;
+	case 115200:
+		br = B115200;
+		break;
+	default:
+		return -1;
+  	}
+	if( cfsetspeed(&_tio, br)<0){
+		return errno;
+	}
     return tcsetattr(_fd, TCSANOW, &_tio);
 }
 
 bool SerialPort::checkRecvBuf(){
-    //int argp;
-    //return (ioctl(_fd, FIONREAD, &argp) > 0);
     return true;
 }
 
@@ -219,6 +234,10 @@ bool SerialPort::recv(unsigned char* buf){
 	  D_NWSTACKF( " %x",*buf );
       return true;
   }
+}
+
+void SerialPort::flush(void){
+  tcsetattr(_fd, TCSAFLUSH, &_tio);
 }
 
 #endif
@@ -268,6 +287,7 @@ void Network::setSerialPort(SerialPort *serialPort){
 }
 
 uint8_t* Network::getResponce(int* len){
+	memset(_responseData, 0, MQTTSN_MAX_PACKET_SIZE + 1);
 	if(_serialPort->checkRecvBuf()){
 		if(readApiFrame(PACKET_TIMEOUT_CHECK)){
 			if(_responseData[API_ID_POS] == XB_API_RESPONSE){
@@ -303,7 +323,7 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
             	return true;
             }
         }else if (_errorCode){
-            D_NWSTACKW("\r\n<=== Packet Error Code = ");
+            D_NWSTACKW("<=== Packet Error Code = ");
             D_NWSTACKLN(_errorCode, DEC);
             D_NWSTACKF("%d\r\n",_errorCode);
             return false;
@@ -428,6 +448,7 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     checksum = 0xff - checksum;
     sendByte(checksum);
     D_NWSTACKW("\r\n");
+    _serialPort->flush();
 }
 
 void Network::sendAddr(uint8_t* addr, uint8_t len, uint8_t* checksum){

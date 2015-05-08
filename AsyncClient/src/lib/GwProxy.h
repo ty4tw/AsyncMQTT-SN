@@ -85,6 +85,10 @@ using namespace std;
 #define GW_SEND_WILLMSG      6
 #define GW_WAIT_CONNACK      7
 #define GW_CONNECTED         8
+#define GW_DISCONNECTING     9
+#define GW_SLEEPING         10
+#define GW_DISCONNECTED     11
+#define GW_SLEPT            12
 
 #define GW_WAIT_PINGRESP     1
 
@@ -99,24 +103,27 @@ public:
 
 	void     initialize(APP_CONFIG config);
 	void     connect(void);
-	void     disconnect(uint16_t sec);
+	void     disconnect(uint16_t sec = 0);
 	int      getResponce(void);
-	int      getConnectResponce(void);
-	uint16_t registerTopic(const char* topic, uint16_t toipcId);
+	uint16_t registerTopic(char* topic, uint16_t toipcId);
 
-	int      readMsg(void);
 	void     setWillTopic(const char* willTopic, uint8_t qos, bool retain = false);
 	void     setWillMsg(const char* willMsg);
 	void     setCleanSession(bool);
 	void     setKeepAliveDuration(uint16_t duration);
 	void     setAdvertiseDuration(uint16_t duration);
-	void     checkPingReq(void);
-	void     checkAdvertise(void);
 	int      writeMsg(const uint8_t* msg);
 	uint16_t getNextMsgId();
 	TopicTable* getTopicTable(void);
 	RegisterManager* getRegisterManager(void);
 private:
+	int      readMsg(void);
+	void     writeGwMsg(void);
+	void     checkPingReq(void);
+	void     checkAdvertise(void);
+	int      getConnectResponce(void);
+	int      getDisconnectResponce(void);
+
 	Network     _network;
 	uint8_t*    _mqttsnMsg;
 	uint16_t    _nextMsgId;
@@ -139,6 +146,7 @@ private:
 	TopicTable  _topicTbl;
 	Timer       _gwAliveTimer;
 	Timer       _keepAliveTimer;
+	uint16_t    _tSleep;
 	char        _msg[MQTTSN_MAX_MSG_LENGTH + 1];
 };
 

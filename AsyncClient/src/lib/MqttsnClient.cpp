@@ -61,7 +61,8 @@ extern void setup(void);
 extern void loop(void);
 extern void interruptCallback(void);
 extern APP_CONFIG theAppConfig;
-extern TaskList theTaskList[];
+extern TaskList      theTaskList[];
+extern OnPublishList theOnPublishList[];
 extern MqttsnClient* theCleint;
 extern void test();
 /*=====================================
@@ -71,7 +72,7 @@ MqttsnClient* theClient = new MqttsnClient();
 
 #if !defined(ARDUINO) && !defined(MQTTSN_TEST)
 int main(int argc, char** argv){
-    setup();
+	setup();
     loop();
 }
 #endif
@@ -167,6 +168,24 @@ void MqttsnClient::run(void){
     }
 }
 
+
+int setUTC(uint32_t* utc){
+	Timer::setUnixTime(*utc);
+	return 0;
+}
+
+
+void MqttsnClient::onConnect(void){
+	/*
+	_gwProxy.getTopicTable()->add(0, MQTTSN_TOPICID_PREDEFINED_TIME, MQTTSN_TOPIC_TYPE_PREDEFINED, setUTC);
+	subscribe(MQTTSN_TOPICID_PREDEFINED_TIME, setUTC, 0, MQTTSN_TOPIC_TYPE_PREDEFINED);
+	*/
+	for(uint8_t i = 0; theOnPublishList[i].pubCallback; i++){
+		subscribe(theOnPublishList[i].topic, theOnPublishList[i].pubCallback, theOnPublishList[i].qos);
+	}
+}
+
+
 #ifdef ARDUINO
 int MqttsnClient::sleep(void){
 	// Enter idle state for 8 s with the rest of peripherals turned off
@@ -193,3 +212,4 @@ int MqttsnClient::sleep(void){
     return 0;
 }
 #endif
+

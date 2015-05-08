@@ -58,7 +58,7 @@ class RegisterManager{
 public:
 	RegisterManager();
 	~RegisterManager();
-	void registerTopic(const char* topicName);
+	void registerTopic(char* topicName);
 	void responceRegAck(uint16_t msgId, uint16_t topicId);
 	void responceRegister(uint8_t* msg, uint16_t msglen);
 	bool isDone(void);
