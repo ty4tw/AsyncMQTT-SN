@@ -158,7 +158,7 @@ uint16_t ClientNode::getWaitedPubTopicId(uint16_t msgId){
 }
 
 uint16_t ClientNode::getWaitedSubTopicId(uint16_t msgId){
-	return _waitedPubTopicIdMap.getTopicId(msgId);
+	return _waitedSubTopicIdMap.getTopicId(msgId);
 }
 
 void ClientNode::eraseWaitedPubTopicId(uint16_t msgId){

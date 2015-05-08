@@ -59,7 +59,8 @@ private:
 /*=====================================
         Class TopicIdMap
  =====================================*/
-typedef  map<uint16_t,uint16_t> TOPICID_MAP;
+typedef map<uint16_t,uint16_t> TOPICID_MAP;
+
 class TopicIdMap{
 public:
 	TopicIdMap();
@@ -70,7 +71,7 @@ public:
 	void clear(void);
 private:
 	TOPICID_MAP _map;
-	Mutex                   _mutex;
+	Mutex       _mutex;
 };
 
 

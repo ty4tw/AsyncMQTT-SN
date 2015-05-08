@@ -422,7 +422,7 @@ void GatewayControlTask::handleSnSubscribe(Event* ev, ClientNode* clnode, MQTTSn
 		}
 
 	}else{
-		/*-- Irregular TopicIdType --*/
+		/*-- Invalid TopicIdType --*/
 		if(sSubscribe->getMsgId()){
 			MQTTSnSubAck* sSuback = new MQTTSnSubAck();
 			sSuback->setMsgId(sSubscribe->getMsgId());

@@ -84,6 +84,7 @@
 /*==========================================================
  *           Light Indicators
  ===========================================================*/
+//#define RASPBERRY_PI
 #define LIGHT_INDICATOR_GREEN   4    // RPi connector 16
 #define LIGHT_INDICATOR_RED     5    // RPi connector 18
 #define LIGHT_INDICATOR_BLUE    6    // RPi connector 22

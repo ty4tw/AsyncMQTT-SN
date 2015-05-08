@@ -66,7 +66,6 @@ private:
     uint16_t _topicId;
     uint8_t  _topicType;
     string   _topicName;
-    TopicCallback  _callback;
     Topic*   _next;
 };
 
@@ -77,7 +76,7 @@ class Topics {
 public:
       Topics();
       ~Topics();
-      Topic*    add(string* topic, uint16_t id = 0, uint8_t type = MQTTSN_TOPIC_TYPE_NORMAL, TopicCallback callback = 0);
+      Topic*    add(string* topic, uint16_t id = 0, uint8_t type = MQTTSN_TOPIC_TYPE_NORMAL);
       uint16_t  getTopicId(string* topic);
       uint16_t  getNextTopicId();
       Topic*    getTopic(uint16_t topicId, uint8_t topicType);

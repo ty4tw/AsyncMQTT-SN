@@ -42,7 +42,6 @@ extern uint16_t getUint16(uint8_t* pos);
 Topic::Topic(){
     _topicId = 0;
     _topicType = 0;
-    _callback = 0;
     _next = 0;
 }
 
@@ -163,7 +162,7 @@ Topic* Topics::getTopic(uint16_t id, uint8_t topicType) {
 	return 0;
 }
 
-Topic* Topics::add(string* topicName, uint16_t id, uint8_t type, TopicCallback callback){
+Topic* Topics::add(string* topicName, uint16_t id, uint8_t type){
 	Topic* elm;
 	if (topicName){
 		elm = getTopic(topicName);
@@ -184,7 +183,6 @@ Topic* Topics::add(string* topicName, uint16_t id, uint8_t type, TopicCallback c
 			elm->_topicId = getNextTopicId();
 		}
 		elm->_topicType = type;
-		elm->_callback = callback;
 
 		if (tp == 0){
 			_first = elm;
@@ -197,8 +195,6 @@ Topic* Topics::add(string* topicName, uint16_t id, uint8_t type, TopicCallback c
 				tp = tp->_next;
 			}
 		}
-	}else{
-		elm->_callback = callback;
 	}
 	return elm;
 }
