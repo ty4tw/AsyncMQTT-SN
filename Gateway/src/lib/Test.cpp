@@ -34,27 +34,7 @@
 using namespace tomyAsyncGateway;
 
 void test(){
-	Topics topicTbl;
-	Topic* tp;
 
-	string topic1 = "topic/1/tomy";
-	string topic2 = "topic/2/tomy";
-	string topic3 = "topic/+";
-	string topic4 = "topic/+/tomy";
-	string topic5 = "topic/5/tomy";
-
-	topicTbl.add(&topic1,1);
-	topicTbl.add(&topic2,2);
-	topicTbl.add(&topic3,3);
-	topicTbl.add(&topic4,4);
-
-	printf("TopicId %d\n",topicTbl.getTopicId(&topic1));
-	printf("TopicId %d\n",topicTbl.getTopicId(&topic2));
-	printf("TopicId %d\n",topicTbl.getTopicId(&topic3));
-	printf("TopicId %d\n",topicTbl.getTopicId(&topic4));
-
-	tp = topicTbl.match(&topic5);
-	printf("Topic='%s'\n",tp->getTopicName()->c_str());
 }
 
 

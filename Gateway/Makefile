@@ -16,6 +16,7 @@ $(SUBDIR)/TLSStack.cpp \
 $(SUBDIR)/Topics.cpp \
 $(SUBDIR)/UDPStack.cpp \
 $(SUBDIR)/XXXXXStack.cpp \
+$(SUBDIR)/Test.cpp \
 $(SUBDIR)/ZBStack.cpp
 
 CXX := g++
@@ -23,7 +24,6 @@ CPPFLAGS +=
 DEFS :=
 LDFLAGS += 
 LIBS +=
-#LDADD := -lpthread -lrt -lssl -lcrypto
 LDADD := -lpthread -lrt -lwiringPi -lssl -lcrypto
 
 CXXFLAGS := -Wall -O3

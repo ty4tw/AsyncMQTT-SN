@@ -32,7 +32,8 @@
 #ifndef GATEWAYDEFINES_H_
 #define GATEWAYDEFINES_H_
 
-#define GATEWAY_VERSION "(Ver 1.1.8)"
+#define GATEWAY_VERSION "(Ver 1.2.0)"
+#define GATEWAY_TYPE "AsyncTomyGateway"
 
 #define BROKER      "Broker"
 #define GREEN_BROKER "\x1b[0m\x1b[32mBroker\x1b[0m\x1b[37m"

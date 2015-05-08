@@ -110,7 +110,7 @@ void GatewayControlTask::run(){
 
 	advertiseTimer.start(keepAlive * 1000UL);
 
-	LOGWRITE("%s AsyncTomyGateway started. %s %s\n", currentDateTime(),GATEWAY_NETWORK,GATEWAY_VERSION);
+	LOGWRITE("%s %s started. %s %s\n", GATEWAY_TYPE, currentDateTime(),GATEWAY_NETWORK,GATEWAY_VERSION);
 
 
 	while(true){
@@ -753,9 +753,10 @@ void GatewayControlTask::handleSnDisconnect(Event* ev, ClientNode* clnode, MQTTS
 	ev1->setBrokerSendEvent(clnode);
 	_res->getBrokerSendQue()->post(ev1);
 
-	delete snMsg;
+	ev1 = new Event();
+	ev1->setClientSendEvent(clnode);
+	_res->getClientSendQue()->post(ev1);
 }
-
 
 /*-------------------------------------------------------
                 Upstream MQTTSnRegister
