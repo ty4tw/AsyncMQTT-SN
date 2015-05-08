@@ -127,14 +127,14 @@ public:
 	void disconnected();
 	bool isConnectSendable();
 	uint16_t getNextMessageId();
-	uint8_t getNextSnMsgId();
-	Topics* getTopics();
+	uint8_t  getNextSnMsgId();
+	Topics*  getTopics();
 
 	TLSStack* getStack();
-	uint32_t getMsb(void);
-	uint32_t getLsb(void);
+	uint32_t  getMsb(void);
+	uint32_t  getLsb(void);
 	uint16_t  getAddress16();
-	string* getNodeId();
+	string*   getNodeId();
 	void setMsb(uint32_t);
 	void setLsb(uint32_t);
 	void setClientAddress16(uint16_t addr);
@@ -164,18 +164,18 @@ private:
 	TopicIdMap  _waitedSubTopicIdMap;
 
 	uint16_t _msgId;
-	uint8_t _snMsgId;
-	Topics* _topics;
+	uint8_t  _snMsgId;
+	Topics*  _topics;
 	ClientStatus _status;
 	uint32_t _keepAliveMsec;
-	Timer _keepAliveTimer;
+	Timer    _keepAliveTimer;
 
 	TLSStack* _stack;
 
 	uint32_t _msb;
 	uint32_t _lsb;
     uint16_t _addr16;
-    string _nodeId;
+    string   _nodeId;
     bool _connAckSaveFlg;
     bool _waitWillMsgFlg;
     MQTTSnConnack*  _connAck;

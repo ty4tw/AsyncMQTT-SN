@@ -748,14 +748,16 @@ void GatewayControlTask::handleSnDisconnect(Event* ev, ClientNode* clnode, MQTTS
 	snMsg->absorb(msg);
 
 	clnode->setBrokerSendMessage(mqMsg);
+	clnode->setClientSendMessage(snMsg);
+	LOGWRITE(FORMAT1, currentDateTime(), "DISCONNECT", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 
 	Event* ev1 = new Event();
-	ev1->setBrokerSendEvent(clnode);
-	_res->getBrokerSendQue()->post(ev1);
-
-	ev1 = new Event();
 	ev1->setClientSendEvent(clnode);
 	_res->getClientSendQue()->post(ev1);
+
+	ev1 = new Event();
+	ev1->setBrokerSendEvent(clnode);
+	_res->getBrokerSendQue()->post(ev1);
 }
 
 /*-------------------------------------------------------
@@ -1004,10 +1006,12 @@ void GatewayControlTask::handlePublish(Event* ev, ClientNode* clnode, MQTTMessag
 			regMsg->setTopicId(tpId);
 			regMsg->setTopicName(tp);
 			if(clnode->isSleep()){
+				// ToDo:  save messages into storage
 				clnode->setClientSleepMessage(regMsg);
 				LOGWRITE(FORMAT2, currentDateTime(), "REGISTER", RIGHTARROW, clnode->getNodeId()->c_str(), "is sleeping. Message was saved.");
 			}else if(clnode->isActive()){
 				LOGWRITE(FORMAT2, currentDateTime(), "REGISTER", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(regMsg));
+				// ToDo: retreive messages from storage
 				if(clnode->isSleep()){
 					clnode->setClientSleepMessage(regMsg);
 				}
