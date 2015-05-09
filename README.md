@@ -1,8 +1,9 @@
-Async MQTT-SN  over UDP and XBee
+Async MQTT-SN  over UDP and XBee 
 ======
-*  Async MQTT-SN Gateway over XBee or UDP (running on linux)     
-*  Async MQTT-SN Client over UDP  (running on linux and Arduino)    
- 
+*  Async MQTT-SN Gateway running on linux       
+*  Async MQTT-SN Client  running on linux and Arduino Uno, Arduino Ehernet       
+*  Program size of Async client for Arduino is 15KB.  previous Sync one is 24KB.
+*  Design concept of Async client is defferent from Sync one. No more MQTT-SN Message classes.
   
 
 Supported functions
