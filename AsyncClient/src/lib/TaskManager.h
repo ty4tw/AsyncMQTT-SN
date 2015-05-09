@@ -44,7 +44,7 @@
 #ifdef ARDUINO
   #include <Timer.h>
 
-  #if defined( NW_DEBUG) || defined(MQTTSN_DEBUG)
+  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
         #include <SoftwareSerial.h>
         extern SoftwareSerial debug;
   #endif
@@ -62,7 +62,7 @@ using namespace std;
 
 namespace tomyAsyncClient {
 struct TaskList{
-    int (*callback)(void);
+    void     (*callback)(void);
 	uint32_t interval;
     uint32_t prevTime;;
 };

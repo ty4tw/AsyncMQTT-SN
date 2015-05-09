@@ -62,9 +62,9 @@
 /*======================================
  *         Debug Flag
  ======================================*/
-//#define NW_DEBUG
-//#define MQTTSN_DEBUG
-//#define DEBUG
+//#define DEBUG_NW
+#define DEBUG_MQTTSN
+
 
 
 /****************************************
@@ -168,51 +168,27 @@ struct UdpAppConfig{
       MACROs for debugging
 ========================================*/
 #ifdef ARDUINO
-	#ifdef NW_DEBUG
-		#define D_NWSTACK(...)    debug.print(__VA_ARGS__)
-		#define D_NWSTACKLN(... ) debug.println(__VA_ARGS__)
-		#define D_NWSTACKW(...)   debug.print(__VA_ARGS__)
-		#define D_NWSTACKF(...)
+	#ifdef DEBUG_NW
+		#define D_NW(...)    debug.print(__VA_ARGS__)
 	#else
-		#define D_NWSTACK(...)
-		#define D_NWSTACKLN(...)
-		#define D_NWSTACKW(...)
-		#define D_NWSTACKF(...)
+		#define D_NW(...)
 	#endif
 
-	#ifdef MQTTSN_DEBUG
+	#ifdef DEBUG_MQTTSN
 		#define D_MQTT(...)    debug.print(__VA_ARGS__)
-		#define D_MQTTW(...)   debug.print(__VA_ARGS__)
-		#define D_MQTTLN(...)  debug.println(__VA_ARGS__)
-		#define D_MQTTF(...)
 	#else
 		#define D_MQTT(...)
-		#define D_MQTTLN(...)
-		#define D_MQTTW(...)
-		#define D_MQTTF(...)
 	#endif
 #else
-	#ifdef NW_DEBUG
-		#define D_NWSTACKF(...)    printf(__VA_ARGS__)
-		#define D_NWSTACKW(...)   printf(__VA_ARGS__)
-		#define D_NWSTACKLN(...)
-		#define D_NWSTACK(...)
+	#ifdef DEBUG_NW
+		#define D_NW(...)   printf(__VA_ARGS__)
 	#else
-		#define D_NWSTACK(...)
-		#define D_NWSTACKLN(...)
-		#define D_NWSTACKW(...)
-		#define D_NWSTACKF(...)
+		#define D_NW(...)
 	#endif
-	#ifdef MQTTSN_DEBUG
-		#define D_MQTTF(...)    printf(__VA_ARGS__)
-		#define D_MQTTW(...)   printf("%s",__VA_ARGS__)
-		#define D_MQTTLN(...)
-		#define D_MQTT(...)
+	#ifdef DEBUG_MQTTSN
+		#define D_MQTT(...)    printf(__VA_ARGS__)
 	#else
 		#define D_MQTT(...)
-		#define D_MQTTLN(...)
-		#define D_MQTTW(...)
-		#define D_MQTTF(...)
 		#endif
 #endif
 

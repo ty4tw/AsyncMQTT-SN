@@ -53,7 +53,7 @@
 #endif
 #include <string.h>
 #include <stdio.h>
-
+#include <unistd.h>
 using namespace std;
 using namespace tomyAsyncClient;
 
@@ -142,8 +142,8 @@ TopicTable* MqttsnClient::getTopicTable(void){
     return _gwProxy.getTopicTable();
 }
 
-int MqttsnClient::publish(const char* topicName, Payload* payload, uint8_t qos, bool retain){
-    return _pubMgr.publish(topicName, payload, qos, retain);
+void MqttsnClient::publish(const char* topicName, Payload* payload, uint8_t qos, bool retain){
+    _pubMgr.publish(topicName, payload, qos, retain);
 }
 
 void MqttsnClient::subscribe(const char* topicName, TopicCallback onPublish, uint8_t qos){
@@ -209,6 +209,7 @@ int MqttsnClient::sleep(void){
 
 #else
 int MqttsnClient::sleep(void){
+	//sleep(1);
     return 0;
 }
 #endif

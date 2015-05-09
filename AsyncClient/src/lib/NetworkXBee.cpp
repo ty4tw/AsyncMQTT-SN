@@ -222,7 +222,7 @@ bool SerialPort::send(unsigned char b){
   if (write(_fd, &b,1) != 1){
       return false;
   }else{
-      D_NWSTACKF( " %x", b);
+      D_NW( " %x", b);
       return true;
   }
 }
@@ -231,7 +231,7 @@ bool SerialPort::recv(unsigned char* buf){
   if(read(_fd, buf, 1) == 0){
       return false;
   }else{
-	  D_NWSTACKF( " %x",*buf );
+	  D_NW( " %x",*buf );
       return true;
   }
 }
@@ -309,24 +309,27 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
         readApiFrame();
 
         if (_available){
-            D_NWSTACKW("<=== CheckSum OK\r\n\n");
+        	D_NW("<=== CheckSum OK\r\n\n");
             if (_responseData[API_ID_POS] == XB_API_RESPONSE){
 				if (_gwAddr16 &&
 					(_responseData[14] & 0x02 ) != 0x02 &&
 					(_gwAddrMsb != getUint32(_responseData + 4) &&
 					(_gwAddrLsb != getUint32(_responseData + 8)))){
-					D_NWSTACKW("  Sender is not Gateway!\r\n" );
+					D_NW("  Sender is not Gateway!\r\n" );
 					return false;
 				}
             	return true;
             }else if (_responseData[API_ID_POS] == XB_API_MODEMSTATUS){
             	return true;
             }
-        }else if (_errorCode){
-            D_NWSTACKW("<=== Packet Error Code = ");
-            D_NWSTACKLN(_errorCode, DEC);
-            D_NWSTACKF("%d\r\n",_errorCode);
+        }else if (_errorCode == CHECKSUM_ERROR ){
+        	D_MQTT("*** CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
+        	D_NW("<=== CHECKSUM ERROR\r\n");
             return false;
+        }else if (_errorCode){
+        	D_MQTT("*** Packet Error Code = %d\r\n",_errorCode);
+			D_NW("<=== Packet Error Code = %d\r\n",_errorCode);
+			return false;
         }
     }
     return false;   //Timeout
@@ -342,7 +345,7 @@ void Network::readApiFrame(){
 
         if ( _byteData == START_BYTE){
             _pos = 1;
-            D_NWSTACKW("\r\n===> Recv:    ");
+            D_NW("\r\n===> Recv:    ");
             continue;
         }
 
@@ -400,7 +403,7 @@ int Network:: unicast(const uint8_t* payload, uint16_t payloadLen){
 }
 
 void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
-    D_NWSTACKW("\r\n===> Send:    ");
+	D_NW("\r\n===> Send:    ");
     uint8_t checksum = 0;
     uint8_t addrBuff[4];
 
@@ -439,7 +442,7 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     sendByte(0x00);   // Option: Use the extended transmission timeout 0x40
     checksum += 0x00;
 
-    D_NWSTACKW("\r\n     Payload: ");
+    D_NW("\r\n     Payload: ");
 
     for ( int i = 0; i < pLen; i++ ){
         sendByte(payload[i]);     // Payload
@@ -447,8 +450,8 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     }
     checksum = 0xff - checksum;
     sendByte(checksum);
-    D_NWSTACKW("\r\n");
-    _serialPort->flush();
+    D_NW("\r\n");
+    //flush();
 }
 
 void Network::sendAddr(uint8_t* addr, uint8_t len, uint8_t* checksum){
@@ -473,6 +476,10 @@ void Network::write(uint8_t val){
 
 bool Network::read(uint8_t *buff){
 	return  _serialPort->recv(buff);
+}
+
+void Network::flush(void){
+	_serialPort->flush();
 }
 
 #endif  /* NETWORK_XBEE */

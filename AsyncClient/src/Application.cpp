@@ -42,7 +42,7 @@
 #include "lib/MqttsnClient.h"
 #endif
 
-#if defined(ARDUINO) && (defined(NW_DEBUG) || defined(MQTTSN_DEBUG) || defined(DEBUG))
+#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
 #include <SoftwareSerial.h>
 SoftwareSerial debug(8, 9);
 #endif
@@ -108,7 +108,8 @@ const char* tpMeasure = "ty4tw/soilReg";
 #define PIN0  0    // measurement port
 #define RP   20    // resistance [K ohom]
 
-int measure(void){
+void measure(void){
+  D_MQTT("measure invoked\n");
   int val = 0;
   //pinMode(PIN5,OUTPUT);
   //digitalWrite(PIN5,1);
@@ -128,11 +129,12 @@ int measure(void){
   pl->set_uint32(GETUTC());
   pl->set_int32(100);
   pl->set_str("Kohom");
-  return PUBLISH(tpMeasure,pl,1);
+  PUBLISH(tpMeasure,pl,1);
 }
 
 
-int task1(void){
+void task1(void){
+  D_MQTT("TASK1 invoked\n");
   Payload* pl = new Payload(36);
   pl->set_array(9);
   pl->set_int32(30);
@@ -144,19 +146,18 @@ int task1(void){
   pl->set_int32(-300);
   pl->set_int32(-70000);
   pl->set_float(1000.01);
-  return PUBLISH(topic1,pl,1);
+  PUBLISH(topic1,pl,1);
 }
 
-int task2(void){
-  //DISCONNECT(0);
-  return 0;
+void task2(void){
+  D_MQTT("TASK2 invoked\n");
 }
 
 /*---------------  List of task invoked by Timer ------------*/
 
 TASK_LIST = {  //TASK( const char* topic, executing duration in second),
              TASK(measure, 40),
-             TASK(task1,6),
+             TASK(task1,60),
              TASK(task2,120),
              END_OF_TASK_LIST
             };
@@ -167,14 +168,14 @@ TASK_LIST = {  //TASK( const char* topic, executing duration in second),
 
 int on_publish2(Payload* payload){
     //theApplication->indicatorOff();
-printf("ON_PUBLISH runs.\n");
+  D_MQTT("ON_PUBLISH invoked. \n");
     return 0;
 }
 
 /*------------ Link Callback to Topic -------------*/
 
 SUBSCRIBE_LIST = {  //SUB(topic, on_publish, QoS),
-                  SUB(topic2, on_publish2, 1),
+                  SUB(topic1, on_publish2, 1),
                   END_OF_SUBSCRIBE_LIST
                  };
 

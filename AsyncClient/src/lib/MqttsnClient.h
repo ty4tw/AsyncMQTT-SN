@@ -82,7 +82,7 @@ public:
     MqttsnClient();
     ~MqttsnClient();
     void onConnect(void);
-    int  publish(const char* topicName, Payload* payload, uint8_t qos, bool retain = false);
+    void publish(const char* topicName, Payload* payload, uint8_t qos, bool retain = false);
     void subscribe(const char* topicName, TopicCallback onPublish, uint8_t qos);
     void subscribe(uint16_t topicId, TopicCallback onPublish, uint8_t qos, uint8_t topicType);
     void unsubscribe(const char* topicName);

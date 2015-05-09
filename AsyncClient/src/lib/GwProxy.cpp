@@ -239,6 +239,7 @@ int GwProxy::getDisconnectResponce(void){
 			_status = GW_DISCONNECTED;
 		}
 	}
+	return 0;
 }
 
 int GwProxy::getResponce(void){
@@ -246,16 +247,28 @@ int GwProxy::getResponce(void){
 	if (len < 0){
 		return len;   //error
 	}
+#ifdef DEBUG_MQTTSN
+	if (len){
+		D_MQTT(" Recved msgType %x\n", _mqttsnMsg[0]);
+	}
+#endif
 
 	if (len == 0){
-		checkPingReq();    // Check PINGREQ required
+		// Check PINGREQ required
+		checkPingReq();
 
+		// Check ADVERTISE valid
 		#if defined(NETWORK_XBEE) || defined(BROADCAST_ENABLE)
-		checkAdvertise();  // Check ADVERTISE
+		checkAdvertise();
 		#endif
 
+		// Check Timeout of REGISTERs
 		_regMgr.checkTimeout();
+
+		// Check Timeout of PUBLISHes,
 		theClient->getPublishManager()->checkTimeout();
+
+		// Check Timeout of SUBSCRIBEs,
         theClient->getSubscribeManager()->checkTimeout();
 
 	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_PUBACK || _mqttsnMsg[0] == MQTTSN_TYPE_PUBCOMP ||
@@ -284,7 +297,11 @@ int GwProxy::getResponce(void){
     	_gwAliveTimer.stop();
     	_keepAliveTimer.stop();
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_ADVERTISE){
-    	_tAdv = getUint16((const uint8_t*)(_mqttsnMsg + 2)) * 1000;
+    	if (getUint16((const uint8_t*)(_mqttsnMsg + 2)) < 61){
+    		_tAdv = getUint16((const uint8_t*)(_mqttsnMsg + 2)) * 1500;
+    	}else{
+    		_tAdv = getUint16((const uint8_t*)(_mqttsnMsg + 2)) * 1100;
+    	}
         _gwAliveTimer.start(_tAdv);
     }
     return 0;
@@ -416,6 +433,7 @@ void GwProxy::checkPingReq(void){
 				_gwId = 0;
                 _pingStatus = 0;
                 _keepAliveTimer.stop();
+                D_MQTT("PINGREQ Timeout\n");
 			}
 		}
 	}
@@ -428,6 +446,7 @@ void GwProxy::checkAdvertise(void){
 		_pingStatus = 0;
 		_gwAliveTimer.stop();
 		_keepAliveTimer.stop();
+		D_MQTT("ADVERTISE Timeout\n");
 	}
 }
 

@@ -44,7 +44,7 @@
 #ifdef NETWORK_XBEE
 #ifdef ARDUINO
   #include <Timer.h>
-  #if defined( NW_DEBUG) || defined(MQTTSN_DEBUG)
+  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
         #include <SoftwareSerial.h>
         extern SoftwareSerial debug;
   #endif
@@ -153,6 +153,7 @@ public:
     int      unicast(const uint8_t* payload, uint16_t payloadLen);
     void     setGwAddress();
     void     resetGwAddress(void);
+    void     flush(void);
     int      initialize(XBeeConfig  config);
     uint8_t* getResponce(int* len);
 

@@ -52,7 +52,7 @@
   #include <RegisterManager.h>
   #include <TopicTable.h>
 
-  #if defined( NW_DEBUG) || defined(MQTTSN_DEBUG)
+  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
         #include <SoftwareSerial.h>
         extern SoftwareSerial debug;
   #endif

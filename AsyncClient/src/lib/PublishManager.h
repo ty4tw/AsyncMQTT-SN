@@ -95,8 +95,8 @@ class PublishManager{
 public:
 	PublishManager();
     ~PublishManager();
-    int  publish(const char* topicName, Payload* payload, uint8_t qos, bool retain);
-    int  publish(uint16_t topicId, Payload* payload, uint8_t qos);
+    void publish(const char* topicName, Payload* payload, uint8_t qos, bool retain);
+    void publish(uint16_t topicId, Payload* payload, uint8_t qos);
     void responce(const uint8_t* msg, uint16_t msglen);
     void published(uint8_t* msg, uint16_t msglen);
     void checkTimeout(void);

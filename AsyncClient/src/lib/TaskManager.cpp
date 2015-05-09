@@ -56,7 +56,7 @@
 using namespace std;
 using namespace tomyAsyncClient;
 extern MqttsnClient* theClient;
-
+extern int getFreeMemory();
 /*=====================================
            TaskManager
  ======================================*/
@@ -82,7 +82,8 @@ void TaskManager::run(void){
 
     while (!theClient->getPublishManager()->isDone()   ||
     	   !theClient->getSubscribeManager()->isDone() ||
-    	   !theClient->getRegisterManager()->isDone() ){
+    	   !theClient->getRegisterManager()->isDone())
+    {
         theClient->getGwProxy()->getResponce();
     }
 }

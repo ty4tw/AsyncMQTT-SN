@@ -75,17 +75,16 @@ PublishManager::~PublishManager(){
 	}
 }
 
-int PublishManager::publish(const char* topicName, Payload* payload, uint8_t qos, bool retain){
+void PublishManager::publish(const char* topicName, Payload* payload, uint8_t qos, bool retain){
     PubElement* elm = add(topicName, 0, payload, qos, retain, theClient->getGwProxy()->getNextMsgId());
     if (elm->status == TOPICID_IS_READY){  
         sendPublish(elm);
     }else{
         theClient->getGwProxy()->registerTopic((char*)topicName, 0);
     }
-	return 0;
 }
 
-int  PublishManager::publish(uint16_t topicId, Payload* payload, uint8_t qos){
+void  PublishManager::publish(uint16_t topicId, Payload* payload, uint8_t qos){
 	PubElement* elm = add(NULLCHAR, topicId, payload, qos, 0, theClient->getGwProxy()->getNextMsgId());
 	sendPublish(elm);
 }
@@ -164,6 +163,16 @@ void PublishManager::sendPubRel(PubElement* elm){
 }
 
 bool PublishManager::isDone(void){
+/*
+#ifdef DEBUG_MQTTSN
+    PubElement* elm = _first;
+	while(elm){
+		D_MQTT(" %d,",elm->msgId);
+		elm = elm->next;
+	}
+#endif
+*/
+
 	return _first == 0;
 }
 
@@ -223,11 +232,13 @@ void PublishManager::checkTimeout(void){
 		if ( elm->sendUTC > 0 && elm->sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
 			if (elm->retryCount > 0){
 				sendPublish(elm);
+				printf("Timeout retry\n");
 			}else{
 				if (elm->next){
 					sav = elm->prev;
 					remove(elm);
 					elm = sav;
+					printf("Timeout delete\n");
 				}
 			}
 		}
