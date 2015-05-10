@@ -125,8 +125,7 @@ bool SerialPort::send(unsigned char b){
 	if(_serialDev->write(b) != 1){
 	  return false;
 	}else{
-	  D_NWSTACK(" ");
-	  D_NWSTACK(b,HEX);
+	  D_NW(" %x",b);
 	  return true;
 	}
 }
@@ -136,8 +135,7 @@ bool SerialPort::recv(unsigned char* buf){
     if ( _serialDev->available() > 0 ){
         buf[0] = _serialDev->read();
 
-        D_NWSTACK(" ");
-        D_NWSTACK(*buf,HEX);
+        D_NW(" %x",*buf);
         return true;
 
     }else{

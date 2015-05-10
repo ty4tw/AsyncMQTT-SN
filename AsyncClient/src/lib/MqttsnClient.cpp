@@ -53,7 +53,7 @@
 #endif
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
+
 using namespace std;
 using namespace tomyAsyncClient;
 
@@ -185,7 +185,7 @@ void MqttsnClient::onConnect(void){
 	}
 }
 
-
+/*
 #ifdef ARDUINO
 int MqttsnClient::sleep(void){
 	// Enter idle state for 8 s with the rest of peripherals turned off
@@ -208,9 +208,9 @@ int MqttsnClient::sleep(void){
 }
 
 #else
+*/
 int MqttsnClient::sleep(void){
-	//sleep(1);
     return 0;
 }
-#endif
+//#endif
 
