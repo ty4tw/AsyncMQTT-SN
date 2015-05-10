@@ -35,6 +35,12 @@
 #ifndef PAYLOAD_H_
 #define PAYLOAD_H_
 
+#ifdef ARDUINO
+	#include <MqttsnClientApp.h>
+#else
+	#include "MqttsnClientApp.h"
+#endif
+
 #define MSGPACK_FALSE    0xc2
 #define MSGPACK_TRUE     0xc3
 #define MSGPACK_POSINT   0x80

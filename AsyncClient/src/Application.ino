@@ -1,22 +1,5 @@
-#include <MqttsnClientApp.h>
-#include <Payload.h>
-#include <NetworkXBee.h>
-#include <MqttsnClient.h>
-#include <SubscribeManager.h>
-#include <RegisterManager.h>
-#include <TopicTable.h>
-#include <TaskManager.h>
-#include <NetworkUdp.h>
-#include <PublishManager.h>
-#include <Timer.h>
-#include <GwProxy.h>
 
-#include <SPI.h>
-#include <Ethernet.h>
-#include <EthernetUdp.h>
-
-#if defined(NW_DEBUG) || defined(MQTTSN_DEBUG) || defined(DEBUG)
-#include <SoftwareSerial.h>
+#if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
 SoftwareSerial debug(8, 9);
 #endif
 

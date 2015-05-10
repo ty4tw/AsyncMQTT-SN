@@ -249,7 +249,10 @@ int GwProxy::getResponce(void){
 	}
 #ifdef DEBUG_MQTTSN
 	if (len){
-		D_MQTT(" recved msgType %x\n", _mqttsnMsg[0]);
+		D_MQTTA(" recved msgType ");
+		D_MQTTA(_mqttsnMsg[0], HEX);
+		D_MQTTA("\r\n");
+		D_MQTTL(" recved msgType %x\n", _mqttsnMsg[0]);
 	}
 #endif
 

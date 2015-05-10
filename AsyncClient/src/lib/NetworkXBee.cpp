@@ -43,26 +43,27 @@
 #ifdef ARDUINO
   #include <Timer.h>
   #include <NetworkXBee.h>
+  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
+        #include <SoftwareSerial.h>
+        extern SoftwareSerial debug;
+  #endif
 #endif  /* ARDUINO */
 
 
 #ifdef LINUX
   #include "Timer.h"
   #include "NetworkXBee.h"
-#endif /* LINUX */
-
-#ifdef LINUX
-        #include <stdio.h>
-        #include <sys/time.h>
-        #include <sys/types.h>
-        #include <sys/stat.h>
-		#include <sys/ioctl.h>
-        #include <unistd.h>
-        #include <stdlib.h>
-        #include <string.h>
-        #include <fcntl.h>
-        #include <errno.h>
-        #include <termios.h>
+  #include <stdio.h>
+  #include <sys/time.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <sys/ioctl.h>
+  #include <unistd.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <fcntl.h>
+  #include <errno.h>
+  #include <termios.h>
 #endif /* LINUX */
 
 using namespace std;
@@ -125,7 +126,8 @@ bool SerialPort::send(unsigned char b){
 	if(_serialDev->write(b) != 1){
 	  return false;
 	}else{
-	  D_NW(" %x",b);
+	  D_NWA(b, HEX);
+	  D_NWL(" %x",b);
 	  return true;
 	}
 }
@@ -134,8 +136,8 @@ bool SerialPort::send(unsigned char b){
 bool SerialPort::recv(unsigned char* buf){
     if ( _serialDev->available() > 0 ){
         buf[0] = _serialDev->read();
-
-        D_NW(" %x",*buf);
+        D_NWA(*buf, HEX);
+        D_NWL(" %x",*buf);
         return true;
 
     }else{
@@ -321,12 +323,21 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
             	return true;
             }
         }else if (_errorCode == CHECKSUM_ERROR ){
-        	D_MQTT("  ! CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
+        	D_MQTTA("  ! CHECKSUM ERROR  MsgType = ");
+        	D_MQTTA(_responseData[16], HEX);
+        	D_MQTTA("\r\n");
+        	D_MQTTL("  ! CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
         	D_NW("<=== CHECKSUM ERROR\r\n");
             return false;
         }else if (_errorCode){
-        	D_MQTT("   ! Packet Error Code = %d\r\n",_errorCode);
-			D_NW("<=== Packet Error Code = %d\r\n",_errorCode);
+        	D_MQTTA("   ! Packet Error Code =" );
+			D_MQTTA(_responseData[16], HEX);
+        	D_MQTTA("\r\n");
+        	D_MQTTL("   ! Packet Error Code = %d\r\n",_errorCode);
+        	D_NWA("<=== Packet Error Code = ");
+        	D_NWA(_errorCode, HEX);
+        	D_NWA("\r\n");
+			D_NWL("<=== Packet Error Code = %d\r\n",_errorCode);
 			return false;
         }
     }

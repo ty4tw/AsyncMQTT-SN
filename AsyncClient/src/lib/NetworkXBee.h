@@ -37,19 +37,15 @@
 
 #ifdef ARDUINO
     #include <MqttsnClientApp.h>
+ 	#include <Timer.h>
 #else
     #include "MqttsnClientApp.h"
+	#include "Timer.h"
+    #include <sys/time.h>
+    #include <iostream>
 #endif
 
 #ifdef NETWORK_XBEE
-#ifdef ARDUINO
-  #include <Timer.h>
-  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
-        #include <SoftwareSerial.h>
-        extern SoftwareSerial debug;
-  #endif
-
-#endif  /* ARDUINO */
 
 using namespace std;
 
@@ -66,12 +62,6 @@ using namespace std;
 
 	#define XB_CTS_PIN   3   // XBee CTS
 	#define XB_SLEEP_PIN 4   // XBee Pinhybernate
-#endif
-
-#ifdef LINUX
-	#include "Timer.h"
-    #include <sys/time.h>
-    #include <iostream>
 #endif
 
 namespace tomyAsyncClient {

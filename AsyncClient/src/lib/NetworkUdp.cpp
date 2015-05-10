@@ -309,14 +309,14 @@ bool UdpPort::open(NETWORK_CONFIG config){
 	}
 
 	if(setsockopt(_sockfdUcast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){
-		D_NWSTACKW("error IP_MULTICAST_LOOP in UdpPort::open\n");
+		D_NW("error IP_MULTICAST_LOOP in UdpPort::open\n");
 
 		close();
 		return false;
 	}
 
 	if(setsockopt(_sockfdMcast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){
-		D_NWSTACKW("error IP_MULTICAST_LOOP in UdpPPort::open\n");
+		D_NW("error IP_MULTICAST_LOOP in UdpPPort::open\n");
 		close();
 		return false;
 	}
@@ -326,13 +326,13 @@ bool UdpPort::open(NETWORK_CONFIG config){
 	mreq.imr_multiaddr.s_addr = getUint32((const uint8_t*)config.ipAddress);
 
 	if( setsockopt(_sockfdMcast, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq) )< 0){
-		D_NWSTACKF("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
+		D_NW("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
 		close();
 		return false;
 	}
 /*
 	if( setsockopt(_sockfdUcast, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq) )< 0){
-		D_NWSTACKF("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
+		D_NW("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
 		close();
 		return false;
 	}
@@ -353,13 +353,13 @@ int UdpPort::unicast(const uint8_t* buf, uint32_t length, uint32_t ipAddress, ui
 
 	int status = ::sendto( _sockfdUcast, buf, length, 0, (const sockaddr*)&dest, sizeof(dest) );
 	if( status < 0){
-		D_NWSTACKF("errno == %d in UdpPort::unicast\n", errno);
+		D_NWL("errno == %d in UdpPort::unicast\n", errno);
 	}else{
-		D_NWSTACKF("sendto %s:%u  [",inet_ntoa(dest.sin_addr),htons(port));
+		D_NWL("sendto %s:%u  [",inet_ntoa(dest.sin_addr),htons(port));
 		for(uint16_t i = 0; i < length ; i++){
-			D_NWSTACKF(" %02x", *(buf + i));
+			D_NWL(" %02x", *(buf + i));
 		}
-		D_NWSTACKF(" ]\n");
+		D_NW(" ]\n");
 	}
 	return status;
 }
@@ -373,11 +373,11 @@ int UdpPort::multicast( const uint8_t* buf, uint32_t length ){
 
 	int status = ::sendto( _sockfdMcast, buf, length, 0, (const sockaddr*)&dest, sizeof(dest) );
 	if( status < 0){
-		D_NWSTACKF("errno == %d in UdpPort::multicast\n", errno);
+		D_NWL("errno == %d in UdpPort::multicast\n", errno);
 	}else{
-		D_NWSTACKF("sendto %s:%u  [",inet_ntoa(dest.sin_addr),htons(_gPortNo));
+		D_NWL("sendto %s:%u  [",inet_ntoa(dest.sin_addr),htons(_gPortNo));
 		for(uint16_t i = 0; i < length ; i++){
-			D_NWSTACKF(" %02x", *(buf + i));
+			D_NWL(" %02x", *(buf + i));
 		}
 		D_NWSTACKF(" ]\n");
 	}
@@ -440,15 +440,15 @@ int UdpPort::recvfrom ( uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddre
 	}
 
 	if (status < 0 && errno != EAGAIN)	{
-		D_NWSTACKF("errno == %d in UdpPort::recvfrom \n", errno);
+		D_NWSL("errno == %d in UdpPort::recvfrom \n", errno);
 	}else if(status > 0){
 		*ipAddressPtr = sender.sin_addr.s_addr;
 		*portPtr = sender.sin_port;
-		D_NWSTACKF("recved from %s:%u [",inet_ntoa(sender.sin_addr), htons(*portPtr));
+		D_NWL("recved from %s:%u [",inet_ntoa(sender.sin_addr), htons(*portPtr));
 		for(uint16_t i = 0; i < status ; i++){
-			D_NWSTACKF(" %02x", *(buf + i));
+			D_NWL(" %02x", *(buf + i));
 		}
-		D_NWSTACKF(" ]\n");
+		D_NW(" ]\n");
 	}else{
 		return 0;
 	}

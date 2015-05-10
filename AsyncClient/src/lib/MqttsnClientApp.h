@@ -167,29 +167,40 @@ struct UdpAppConfig{
 /*======================================
       MACROs for debugging
 ========================================*/
-#ifdef ARDUINO
-	#ifdef DEBUG_NW
-		#define D_NW(...)    debug.print(__VA_ARGS__)
-	#else
-		#define D_NW(...)
-	#endif
+#ifndef DEBUG_NW
+	#define D_NWA(...)
+	#define D_NWL(...)
+	#define D_NW(...)
+#endif
 
-	#ifdef DEBUG_MQTTSN
-		#define D_MQTT(...)    debug.print(__VA_ARGS__)
-	#else
-		#define D_MQTT(...)
-	#endif
-#else
-	#ifdef DEBUG_NW
-		#define D_NW(...)   printf(__VA_ARGS__)
-	#else
-		#define D_NW(...)
-	#endif
-	#ifdef DEBUG_MQTTSN
-		#define D_MQTT(...)    printf(__VA_ARGS__)
-	#else
-		#define D_MQTT(...)
-		#endif
+#ifndef DEBUG_MQTTSN
+	#define D_MQTTA(...)
+	#define D_MQTTL(...)
+	#define D_MQTT(...)
+#endif
+
+#if defined(DEBUG_NW) && defined(ARDUINO)
+	#define D_NWA(...)    debug.print(__VA_ARGS__)
+	#define D_NWL(...)
+	#define D_NW(...)     debug.print(__VA_ARGS__)
+#endif
+
+#if defined(DEBUG_NW) && ! defined(ARDUINO)
+	#define D_NWA(...)
+	#define D_NWL(...)    printf(__VA_ARGS__)
+	#define D_NW(...)     printf(__VA_ARGS__)
+#endif
+
+#if defined(DEBUG_MQTTSN) && defined(ARDUINO)
+    #define D_MQTTA(...)  debug.print(__VA_ARGS__)
+	#define D_MQTTL(...)
+	#define D_MQTT(...)   debug.print(__VA_ARGS__)
+#endif
+
+#if defined(DEBUG_MQTTSN) && ! defined(ARDUINO)
+	#define D_MQTTA(...)
+    #define D_MQTTL(...)  printf(__VA_ARGS__)
+	#define D_MQTT(...)   printf(__VA_ARGS__)
 #endif
 
 /*======================================
