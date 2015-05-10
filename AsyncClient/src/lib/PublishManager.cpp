@@ -162,17 +162,8 @@ void PublishManager::sendPubRel(PubElement* elm){
 	theClient->getGwProxy()->writeMsg(msg);
 }
 
-bool PublishManager::isDone(void){
-/*
-#ifdef DEBUG_MQTTSN
-    PubElement* elm = _first;
-	while(elm){
-		D_MQTT(" %d,",elm->msgId);
-		elm = elm->next;
-	}
-#endif
-*/
 
+bool PublishManager::isDone(void){
 	return _first == 0;
 }
 
@@ -232,13 +223,16 @@ void PublishManager::checkTimeout(void){
 		if ( elm->sendUTC > 0 && elm->sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
 			if (elm->retryCount > 0){
 				sendPublish(elm);
-				printf("Timeout retry\n");
+				D_MQTT("...Timeout retry\r\n");
 			}else{
+				D_MQTT("...Timeout delete\r\n");
 				if (elm->next){
 					sav = elm->prev;
 					remove(elm);
 					elm = sav;
-					printf("Timeout delete\n");
+				}else{
+					remove(elm);
+					break;
 				}
 			}
 		}

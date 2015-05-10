@@ -323,11 +323,11 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
             	return true;
             }
         }else if (_errorCode == CHECKSUM_ERROR ){
-        	D_MQTT("*** CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
+        	D_MQTT("  ! CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
         	D_NW("<=== CHECKSUM ERROR\r\n");
             return false;
         }else if (_errorCode){
-        	D_MQTT("*** Packet Error Code = %d\r\n",_errorCode);
+        	D_MQTT("   ! Packet Error Code = %d\r\n",_errorCode);
 			D_NW("<=== Packet Error Code = %d\r\n",_errorCode);
 			return false;
         }

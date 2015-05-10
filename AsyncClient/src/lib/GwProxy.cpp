@@ -97,7 +97,6 @@ void GwProxy::connect(){
 
 	while (_status != GW_CONNECTED){
 		pos = _msg;
-		memset(_msg, 0, MQTTSN_MAX_MSG_LENGTH + 1);
 
 		if (_status == GW_SEND_WILLMSG){
 			*pos++ = 2 + (uint8_t)strlen(_willMsg);
@@ -124,6 +123,7 @@ void GwProxy::connect(){
 			setUint16((uint8_t*)pos, _tPing);
 			pos += 2;
 			strncpy(pos, _clientId, clientIdLen);
+			_msg[ 6 + clientIdLen] = 0;
 			if (_willMsg && _willTopic){
 				_msg[2] = _msg[2] | MQTTSN_FLAG_WILL;   // CONNECT
 				_status = GW_WAIT_WILLTOPICREQ;
@@ -154,7 +154,7 @@ int GwProxy::getConnectResponce(void){
 	if (len == 0){
 		if (_sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
 			if (--_retryCount > 0){
-				writeMsg((const uint8_t*)_msg);
+				writeMsg((const uint8_t*)_msg);  // Not writeGwMsg()
 				_sendUTC = Timer::getUnixTime();
 			}else{
 				_sendUTC = 0;
@@ -181,7 +181,7 @@ int GwProxy::getConnectResponce(void){
 			_status = GW_CONNECTED;
 			_keepAliveTimer.start(_tPing);
 			_topicTbl.clearTopic();
-			theClient->onConnect();
+			theClient->onConnect();  // SUBSCRIBEs are conducted
 		}else{
 			_status = GW_CONNECTING;
 		}
@@ -249,7 +249,7 @@ int GwProxy::getResponce(void){
 	}
 #ifdef DEBUG_MQTTSN
 	if (len){
-		D_MQTT(" Recved msgType %x\n", _mqttsnMsg[0]);
+		D_MQTT(" recved msgType %x\n", _mqttsnMsg[0]);
 	}
 #endif
 
@@ -433,7 +433,7 @@ void GwProxy::checkPingReq(void){
 				_gwId = 0;
                 _pingStatus = 0;
                 _keepAliveTimer.stop();
-                D_MQTT("PINGREQ Timeout\n");
+                D_MQTT("   !!! PINGREQ Timeout\n");
 			}
 		}
 	}
@@ -446,7 +446,7 @@ void GwProxy::checkAdvertise(void){
 		_pingStatus = 0;
 		_gwAliveTimer.stop();
 		_keepAliveTimer.stop();
-		D_MQTT("ADVERTISE Timeout\n");
+		D_MQTT("   !!! ADVERTISE Timeout\n");
 	}
 }
 
