@@ -66,40 +66,31 @@ Network::~Network(){
 
 }
 
-void Network::unicast(NWAddress64* addr64, uint16_t addr16, uint8_t* payload, uint16_t payloadLength){
-	UDPPort::unicast(payload, payloadLength, addr64->getLsb(), addr16);
+void Network::unicast(const uint8_t* payload, uint16_t payloadLength, uint32_t msb, uint32_t ipAddress, uint16_t port){
+	UDPPort::unicast(payload, payloadLength, ipAddress, port);
 }
 
-void Network::broadcast(uint8_t* payload, uint16_t payloadLength){
+void Network::broadcast(const uint8_t* payload, uint16_t payloadLength){
 	UDPPort::multicast(payload, payloadLength);
 }
 
-bool Network::getResponse(NWResponse* response){
-	uint32_t ipAddress = 0;
-	uint16_t portNo = 0;
-	uint16_t msgLen;
-	uint8_t  msgType;
-
-	uint8_t* buf = response->getPayloadPtr();
-	uint16_t recvLen = UDPPort::recv(buf, MQTTSN_MAX_FRAME_SIZE, &ipAddress, &portNo);
+uint8_t* Network::getResponce(int* len){
+	uint16_t recvLen = UDPPort::recv(_rxDataBuf, MQTTSN_MAX_FRAME_SIZE, &_ipAddress, &_portNo);
 	if(recvLen < 0){
-		return false;
+		*len = recvLen;
+		return 0;
 	}else{
-		if(buf[0] == 0x01){
-			msgLen = getUint16(buf + 1);
-			msgType = *(buf + 3);
+		uint8_t pos = 0;
+		if(_rxDataBuf[0] == 0x01){
+			pos++;
+		}
+		if(recvLen != getUint16(_rxDataBuf + pos )){
+			*len = 0;
+			return 0;
 		}else{
-			msgLen = (uint16_t)*(buf);
-			msgType = *(buf + 1);
+			*len = getUint16(_rxDataBuf + pos );
+			return _rxDataBuf;
 		}
-		if(msgLen != recvLen){
-			return false;
-		}
-		response->setLength(msgLen);
-		response->setMsgType(msgType);
-		response->setClientAddress16(portNo);
-		response->setClientAddress64(0, ipAddress);
-		return true;
 	}
 }
 
@@ -107,6 +98,17 @@ int Network::initialize(UdpConfig  config){
 	return UDPPort::open(config);
 }
 
+uint32_t Network::getAddrMsb(void){
+	return 0;
+}
+
+uint32_t Network::getAddrLsb(void){
+	return _ipAddress;
+}
+
+uint16_t Network::getAddr16(void){
+	return _portNo;
+}
 
 /*=========================================
        Class udpStack
@@ -270,119 +272,5 @@ int UDPPort::recvfrom (int sockfd, uint8_t* buf, uint16_t len, uint8_t flags, ui
 	return status;
 }
 
-
-/*=========================================
-             Class NLLongAddress
- =========================================*/
-NWAddress64::NWAddress64(){
-    _msb = _lsb = 0;
-}
-
-NWAddress64::NWAddress64(uint32_t msb, uint32_t lsb){
-    _msb = msb;
-    _lsb = lsb;
-}
-
-uint32_t NWAddress64::getMsb(){
-    return _msb;
-}
-
-uint32_t NWAddress64::getLsb(){
-    return _lsb;
-}
-
-void NWAddress64::setMsb(uint32_t msb){
-    _msb = msb;
-}
-
-void NWAddress64::setLsb(uint32_t lsb){
-    _lsb = lsb;
-}
-
-bool NWAddress64::operator==(NWAddress64& addr){
-	if(_msb == addr.getMsb() && _lsb == addr.getLsb()){
-		return true;
-	}else{
-		return false;
-	}
-}
-
-/*=========================================
-             Class ZBResponse
- =========================================*/
-NWResponse::NWResponse(){
-    _addr16 = 0;
-    memset( _frameDataPtr, 0, MQTTSN_MAX_FRAME_SIZE);
-}
-
-uint8_t  NWResponse::getFrameLength(){
-	return _len;
-}
-
-void NWResponse::setLength(uint16_t len){
-	_len = len;
-}
-
-NWAddress64*  NWResponse::getClientAddress64(){
-    return &_addr64;
-}
-
-uint16_t NWResponse::getClientAddress16(){
-  return _addr16;
-}
-
-void  NWResponse::setClientAddress64(uint32_t msb, uint32_t lsb){
-    _addr64.setMsb(msb);
-    _addr64.setLsb(lsb);
-}
-
-void  NWResponse::setClientAddress16(uint16_t addr16){
-	_addr16 = addr16;
-}
-
-void NWResponse::setMsgType(uint8_t type){
-	_type = type;
-}
-
-
-uint8_t NWResponse::getMsgType(){
-	if(_len > 255){
-		return _frameDataPtr[3];
-	}else{
-		return _frameDataPtr[1];
-	}
-}
-
-uint8_t* NWResponse::getBody(){
-	if(_len > 255){
-		return _frameDataPtr + 4;
-	}else{
-		return _frameDataPtr + 2;
-	}
-}
-
-uint16_t NWResponse::getBodyLength(){
-	if(_len > 255){
-		return getPayloadLength() - 4;
-	}else{
-		return getPayloadLength() - 2;
-	}
-}
-
-uint8_t NWResponse::getPayload(uint8_t index){
-		return _frameDataPtr[index + 2];
-
-}
-
-uint8_t* NWResponse::getPayloadPtr(){
-
-		return _frameDataPtr;
-
-}
-
-uint8_t NWResponse::getPayloadLength(){
-
-	return _len;
-}
 
 #endif /* NETWORK_UDP */

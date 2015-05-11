@@ -60,52 +60,6 @@
 using namespace std;
 
 namespace tomyAsyncGateway{
-/*============================================
-              NWAddress64
- =============================================*/
-class NWAddress64 {
-public:
-	NWAddress64(uint32_t msb, uint32_t lsb);
-	NWAddress64(void);
-	uint32_t getMsb();
-	uint32_t getLsb();
-	void setMsb(uint32_t msb);
-	void setLsb(uint32_t lsb);
-	bool operator==(NWAddress64&);
-private:
-	uint32_t _msb;
-	uint32_t _lsb;
-};
-
-/*============================================
-               NWResponse
- =============================================*/
-
-class NWResponse {
-public:
-	NWResponse();
-	uint8_t  getMsgType();
-	uint8_t  getFrameLength();
-	uint8_t  getPayload(uint8_t index);
-	uint8_t* getPayloadPtr();
-	uint8_t* getBody();
-	uint16_t getBodyLength();
-	uint8_t  getPayloadLength();
-	uint16_t getClientAddress16();
-	NWAddress64* getClientAddress64();
-
-	void setLength(uint16_t len);
-  	void setMsgType(uint8_t type);
-	void setClientAddress64(uint32_t msb, uint32_t ipAddress);
-	void setClientAddress16(uint16_t portNo);
-private:
-	NWAddress64 _addr64;
-	uint16_t _addr16;
-	uint16_t _len;
-	uint8_t  _type;
-	uint8_t _frameDataPtr[MQTTSN_MAX_FRAME_SIZE];
-};
-
 
 /*========================================
        Class UpdPort
@@ -143,13 +97,18 @@ public:
     Network();
     ~Network();
 
-    void unicast(uint8_t* payload, uint16_t payloadLength, uint32_t msb, uint32_t lsb, uint16_t port);
-	void broadcast(uint8_t* payload, uint16_t payloadLength);
-	bool getResponse(NWResponse* response);
-    int  initialize(UdpConfig  config);
+    void unicast(const uint8_t* payload, uint16_t payloadLength, uint32_t msb, uint32_t ipAddress, uint16_t port);
+	void broadcast(const uint8_t* payload, uint16_t payloadLength);
+	uint8_t* getResponce(int* len);
+    int  initialize(NETWORK_CONFIG  config);
+    uint32_t getAddrMsb(void);
+    uint32_t getAddrLsb(void);
+    uint16_t getAddr16(void);
 
 private:
-
+    uint32_t _ipAddress;
+    uint16_t _portNo;
+    uint8_t  _rxDataBuf[MQTTSN_MAX_FRAME_SIZE + 1];
 };
 
 

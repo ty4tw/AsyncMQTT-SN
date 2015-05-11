@@ -48,7 +48,6 @@
 using namespace std;
 using namespace tomyAsyncGateway;
 
-extern uint8_t* mqcalloc(uint8_t length);
 extern uint16_t getUint16(uint8_t* pos);
 extern uint32_t getUint32(uint8_t* pos);
 extern void setUint16(uint8_t* pos, uint16_t val);
