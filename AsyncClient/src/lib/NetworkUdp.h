@@ -93,18 +93,18 @@ public:
 	UdpPort();
 	virtual ~UdpPort();
 
-	int open(NETWORK_CONFIG config);
+	bool open(UdpConfig config);
 
 	int unicast(const uint8_t* buf, uint32_t length, uint32_t ipaddress, uint16_t port  );
 	int multicast( const uint8_t* buf, uint32_t length );
-	int recv(uint8_t* buf, bool nonblock, uint32_t* ipaddress, uint16_t* port );
+	int recv(uint8_t* buf, uint16_t len, bool nonblock, uint32_t* ipaddress, uint16_t* port );
 	int recv(uint8_t* buf, int flags);
 	bool checkRecvBuf();
 	bool isUnicast();
 
 private:
 	void close();
-	int recvfrom ( uint8_t* buf, int flags, uint32_t* ipaddress, uint16_t* port );
+	int recvfrom ( uint8_t* buf, uint16_t len, int flags, uint32_t* ipaddress, uint16_t* port );
 
 #ifdef LINUX
 	int      _sockfdUcast;
@@ -139,15 +139,15 @@ public:
     Network();
     ~Network();
 
-    int  broadcast(const uint8_t* xmitData);
-    int  unicast(const uint8_t* xmitData);
-    int  readPacket(const uint8_t* data);
+    int  broadcast(const uint8_t* payload, uint16_t payloadLen);
+    int  unicast(const uint8_t* payload, uint16_t payloadLen);
     void setGwAddress(void);
-    void setFixedGwAddress(void);
     void resetGwAddress(void);
-    void setSleep();
-    bool  initialize(NETWORK_CONFIG  config);
+    void setFixedGwAddress(void);
+    bool initialize(NETWORK_CONFIG  config);
+    uint8_t*  getResponce(int* len);
 private:
+    void setSleep();
     int  readApiFrame(void);
 
     uint32_t _gwIpAddress;
@@ -156,7 +156,7 @@ private:
 	uint16_t _portNo;
     int     _returnCode;
     bool _sleepflg;
-    uint8_t _rxFrameDataBuf[MQTTSN_MAX_PACKET_SIZE];  // defined in MqttsnClientApp.h
+    uint8_t _rxDataBuf[MQTTSN_MAX_PACKET_SIZE + 1];  // defined in MqttsnClientApp.h
 
 };
 

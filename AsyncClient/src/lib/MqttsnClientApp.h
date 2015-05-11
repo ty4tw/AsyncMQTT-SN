@@ -50,8 +50,9 @@
 
 
 /*-------- Select Network  -------------*/
-#define NETWORK_XBEE
-//#define NETWORK_UDP
+//#define NETWORK_XBEE
+#define NETWORK_UDP
+#define BROADCAST_ENABLE
 
 
 /*--- XBee Buffer Flow Control --*/

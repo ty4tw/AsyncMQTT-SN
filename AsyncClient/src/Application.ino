@@ -15,7 +15,7 @@ extern MqttsnClient* theClient;
  XBEE_APP_CONFIG = {
     {
         "ArduinoNano01", 
-        9600,           //Baudrate
+        57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         0               //Device (for linux App)
     },
@@ -63,6 +63,7 @@ const char* tpMeasure = "ty4tw/soilReg";
 #define RP   20    // resistance [K ohom]
 
 void measure(){
+  D_MQTTA("measure invoked\r\n");
   int val = 0;
   pinMode(PIN5,OUTPUT);
   digitalWrite(PIN5,1);
@@ -87,6 +88,7 @@ void measure(){
 
 
 void task1(){
+  D_MQTTA("TASK1 invoked\r\n");
   Payload* pl = new Payload(36);
   pl->set_array(9);
   pl->set_int32(30);
@@ -114,7 +116,7 @@ END_OF_TASK_LIST};
  *------------------------------------------------------*/
 
 int on_publish2(tomyAsyncClient::Payload* pl){
-    //theApplication->indicatorOff();
+    D_MQTTA("on_publish2 invoked\r\n");
     digitalWrite(133,1);
     delay(500);
     digitalWrite(13,0);
@@ -139,7 +141,7 @@ void interruptCallback(){
  *            setup() function
  *------------------------------------------------------*/
  void setup(){
-
+  
  }
 
 

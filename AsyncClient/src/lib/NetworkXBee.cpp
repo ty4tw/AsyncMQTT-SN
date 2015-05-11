@@ -487,8 +487,4 @@ bool Network::read(uint8_t *buff){
 	return  _serialPort->recv(buff);
 }
 
-void Network::flush(void){
-	_serialPort->flush();
-}
-
 #endif  /* NETWORK_XBEE */

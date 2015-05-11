@@ -139,8 +139,9 @@ void GwProxy::connect(){
 			_status = GW_SEARCHING;
 			writeGwMsg();
           #else
+			// UDP without multicast
             _status = GW_CONNECTING;
-            _network.setFixedGwAddress();
+            _network.setGwAddress();
 		  #endif
 		}
 		getConnectResponce();
@@ -444,11 +445,11 @@ void GwProxy::checkPingReq(void){
 
 void GwProxy::checkAdvertise(void){
 	if ( _gwAliveTimer.isTimeUp()){
-		_status = GW_LOST;
-		_gwId = 0;
-		_pingStatus = 0;
+		//_status = GW_LOST;
+		//_gwId = 0;
+		//_pingStatus = 0;
 		_gwAliveTimer.stop();
-		_keepAliveTimer.stop();
+		//_keepAliveTimer.stop();
 		D_MQTT("   !!! ADVERTISE Timeout\n");
 	}
 }

@@ -83,7 +83,7 @@ namespace tomyAsyncClient {
 #define API_ID_POS                    3
 #define PACKET_OVERHEAD_LENGTH        6
 
-#define PACKET_TIMEOUT_CHECK        200   // 100ms
+#define PACKET_TIMEOUT_CHECK         50   // 50ms
 
 /*====  STATUS ====== */
 #define NO_ERROR               0
@@ -143,8 +143,7 @@ public:
     int      unicast(const uint8_t* payload, uint16_t payloadLen);
     void     setGwAddress();
     void     resetGwAddress(void);
-    void     flush(void);
-    int      initialize(XBeeConfig  config);
+    int      initialize(NETWORK_CONFIG  config);
     uint8_t* getResponce(int* len);
 
 private:

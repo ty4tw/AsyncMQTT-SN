@@ -60,7 +60,7 @@ extern MqttsnClient* theClient;
  XBEE_APP_CONFIG = {
     {
     	"client01",     //ClientId
-        9600,          //Baudrate
+        57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         "/dev/ttyUSB0"               //Device (for linux App)
     },

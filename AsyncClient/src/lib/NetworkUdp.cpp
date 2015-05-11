@@ -97,24 +97,33 @@ int Network::broadcast(const uint8_t* xmitData, uint16_t dataLen){
 }
 
 int  Network::unicast(const uint8_t* xmitData, uint16_t dataLen){
-	return UdpPort::unicast(xmitData, _gwIpAddress, _gwPortNo);
+	return UdpPort::unicast(xmitData, dataLen, _gwIpAddress, _gwPortNo);
 }
 
 
-int  Network::readPacket(const uint8_t* data){
-	uint16_t recvLen = UdpPort::recv(_rxFrameDataBuf, MQTTSN_MAX_PACKET_SIZE, false, &_ipAddress, &_portNo);
+uint8_t*  Network::getResponce(int* len){
+	uint16_t recvLen = UdpPort::recv(_rxDataBuf, MQTTSN_MAX_PACKET_SIZE, false, &_ipAddress, &_portNo);
 	if(_gwIpAddress && isUnicast() && (_ipAddress != _gwIpAddress) && (_portNo != _gwPortNo)){
+		*len = 0;
 		return 0;
 	}
 
-	if (recvLen <= 0){
-		return recvLen;
-	}else if ( recvLen > 0){
-		data = (const uint8_t*)_rxFrameDataBuf;
-		return recvLen;
+	if(recvLen < 0){
+		*len = recvLen;
+		return 0;
+	}else{
+		uint8_t pos = 0;
+		if(_rxDataBuf[0] == 0x01){
+			pos++;
+		}
+		if(recvLen != getUint16(_rxDataBuf + pos )){
+			*len = 0;
+			return 0;
+		}else{
+			*len = getUint16(_rxDataBuf + pos );
+			return _rxDataBuf;
+		}
 	}
-	data = (const uint8_t*)_rxFrameDataBuf;
-	return recvLen;
 }
 
 void Network::setGwAddress(void){
@@ -161,7 +170,7 @@ void UdpPort::close(){
 }
 
 
-int UdpPort::open(UdpConfig config){
+bool UdpPort::open(UdpConfig config){
 	_gIpAddr = IPAddress(config.ipAddress);
 	_cIpAddr = IPAddress(config.ipLocal);
 	_gPortNo = config.gPortNo;
@@ -172,13 +181,13 @@ int UdpPort::open(UdpConfig config){
 	Ethernet.begin(_macAddr, _cIpAddr);
 
 	if(_udpMulticast.beginMulti(_gIpAddr, _gPortNo) == 0){
-		return 0;
+		return false;
 	}
 	if(_udpUnicast.begin(_uPortNo) == 0){
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
 int UdpPort::unicast(const uint8_t* buf, uint32_t length, uint32_t ipAddress, uint16_t port  ){
@@ -264,7 +273,7 @@ void UdpPort::close(){
 	}
 }
 
-bool UdpPort::open(NETWORK_CONFIG config){
+bool UdpPort::open(UdpConfig config){
 	const int reuse = 1;
 	char loopch = 0;
 
@@ -323,6 +332,14 @@ bool UdpPort::open(NETWORK_CONFIG config){
 
 	ip_mreq mreq;
 	mreq.imr_interface.s_addr = INADDR_ANY;
+
+	uint8_t sav = config.ipAddress[3];
+	config.ipAddress[3] = config.ipAddress[0];
+	config.ipAddress[0] = sav;
+	sav = config.ipAddress[2];
+	config.ipAddress[2] = config.ipAddress[1];
+	config.ipAddress[1] = sav;
+
 	mreq.imr_multiaddr.s_addr = getUint32((const uint8_t*)config.ipAddress);
 
 	if( setsockopt(_sockfdMcast, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq) )< 0){
@@ -379,7 +396,7 @@ int UdpPort::multicast( const uint8_t* buf, uint32_t length ){
 		for(uint16_t i = 0; i < length ; i++){
 			D_NWL(" %02x", *(buf + i));
 		}
-		D_NWSTACKF(" ]\n");
+		D_NWL(" ]\n");
 	}
 	return errno;
 }
@@ -425,7 +442,7 @@ int UdpPort::recv(uint8_t* buf, uint16_t len, bool flg, uint32_t* ipAddressPtr, 
 	return recvfrom (buf, len, flags, ipAddressPtr, portPtr );
 }
 
-int UdpPort::recvfrom ( uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddressPtr, uint16_t* portPtr ){
+int UdpPort::recvfrom (uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddressPtr, uint16_t* portPtr ){
 	struct sockaddr_in sender;
 	int status;
 	socklen_t addrlen = sizeof(sender);
@@ -440,7 +457,7 @@ int UdpPort::recvfrom ( uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddre
 	}
 
 	if (status < 0 && errno != EAGAIN)	{
-		D_NWSL("errno == %d in UdpPort::recvfrom \n", errno);
+		D_NWL("errno == %d in UdpPort::recvfrom \n", errno);
 	}else if(status > 0){
 		*ipAddressPtr = sender.sin_addr.s_addr;
 		*portPtr = sender.sin_port;
