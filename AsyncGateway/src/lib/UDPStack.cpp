@@ -75,20 +75,21 @@ void Network::broadcast(const uint8_t* payload, uint16_t payloadLength){
 }
 
 uint8_t* Network::getResponce(int* len){
-	uint16_t recvLen = UDPPort::recv(_rxDataBuf, MQTTSN_MAX_FRAME_SIZE, &_ipAddress, &_portNo);
-	if(recvLen < 0){
-		*len = recvLen;
+	uint16_t recvLen;
+	*len = UDPPort::recv(_rxDataBuf, MQTTSN_MAX_FRAME_SIZE, &_ipAddress, &_portNo);
+	if(len < 0){
 		return 0;
 	}else{
-		uint8_t pos = 0;
 		if(_rxDataBuf[0] == 0x01){
-			pos++;
+			recvLen = getUint16(_rxDataBuf + 1 );
+		}else{
+			recvLen = _rxDataBuf[0];
 		}
-		if(recvLen != getUint16(_rxDataBuf + pos )){
+		if(recvLen != *len){
 			*len = 0;
 			return 0;
 		}else{
-			*len = getUint16(_rxDataBuf + pos );
+			*len = recvLen;
 			return _rxDataBuf;
 		}
 	}

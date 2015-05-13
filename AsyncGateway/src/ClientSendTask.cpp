@@ -54,9 +54,9 @@ ClientSendTask::~ClientSendTask(){
 
 
 void ClientSendTask::run(){
-	NETWORK_CONFIG config;
-#ifdef NETWORK_XBEE
 
+#ifdef NETWORK_XBEE
+	NETWORK_CONFIG config;
 	char param[TOMYFRAME_PARAM_MAX];
 	bool secure = true;
 

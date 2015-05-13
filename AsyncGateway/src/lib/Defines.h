@@ -57,7 +57,7 @@
 /*=================================
  *    Debug LOG
  ==================================*/
-//#define DEBUG_NWSTACK
+#define DEBUG_NWSTACK
 
 /*=================================
       Debug Print functions
