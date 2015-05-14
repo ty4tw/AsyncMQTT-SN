@@ -109,7 +109,7 @@ const char* tpMeasure = "ty4tw/soilReg";
 #define RP   20    // resistance [K ohom]
 
 void measure(void){
-  D_MQTT("measure invoked\n");
+  D_MQTTL("measure invoked\n");
   int val = 0;
   //pinMode(PIN5,OUTPUT);
   //digitalWrite(PIN5,1);
@@ -134,7 +134,7 @@ void measure(void){
 
 
 void task1(void){
-  D_MQTT("TASK1 invoked\n");
+  D_MQTTL("TASK1 invoked\n");
   Payload* pl = new Payload(36);
   pl->set_array(9);
   pl->set_int32(30);
@@ -150,7 +150,7 @@ void task1(void){
 }
 
 void task2(void){
-  D_MQTT("TASK2 invoked\n");
+  D_MQTTL("TASK2 invoked\n");
 }
 
 /*---------------  List of task invoked by Timer ------------*/
@@ -168,7 +168,7 @@ TASK_LIST = {  //TASK( const char* topic, executing duration in second),
 
 int on_publish2(Payload* payload){
     //theApplication->indicatorOff();
-  D_MQTT("ON_PUBLISH invoked. \n");
+  D_MQTTL("ON_PUBLISH invoked. \n");
     return 0;
 }
 

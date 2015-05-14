@@ -250,9 +250,9 @@ int GwProxy::getResponce(void){
 	}
 #ifdef DEBUG_MQTTSN
 	if (len){
-		D_MQTTA(" recved msgType ");
+		D_MQTTA(F(" recved msgType "));
 		D_MQTTA(_mqttsnMsg[0], HEX);
-		D_MQTTA("\r\n");
+		D_MQTTALN();
 		D_MQTTL(" recved msgType %x\n", _mqttsnMsg[0]);
 	}
 #endif
@@ -294,7 +294,7 @@ int GwProxy::getResponce(void){
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_PINGRESP){
         if (_pingStatus == GW_WAIT_PINGRESP){
             _pingStatus = 0;
-            _keepAliveTimer.start(_tPing);
+            resetPingReqTimer();
         }
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_DISCONNECT){
     	_status = GW_LOST;
@@ -437,7 +437,8 @@ void GwProxy::checkPingReq(void){
 				_gwId = 0;
                 _pingStatus = 0;
                 _keepAliveTimer.stop();
-                D_MQTT("   !!! PINGREQ Timeout\n");
+                D_MQTTA(F("   !!! PINGREQ Timeout\n"));
+                D_MQTTL("   !!! PINGREQ Timeout\n");
 			}
 		}
 	}
@@ -450,7 +451,8 @@ void GwProxy::checkAdvertise(void){
 		//_pingStatus = 0;
 		_gwAliveTimer.stop();
 		//_keepAliveTimer.stop();
-		D_MQTT("   !!! ADVERTISE Timeout\n");
+		D_MQTTA(F("   !!! ADVERTISE Timeout\n"));
+		D_MQTTL("   !!! ADVERTISE Timeout\n");
 	}
 }
 
@@ -460,4 +462,8 @@ TopicTable* GwProxy::getTopicTable(void){
 
 RegisterManager* GwProxy::getRegisterManager(void){
 	return &_regMgr;
+}
+
+void GwProxy::resetPingReqTimer(void){
+	_keepAliveTimer.start(_tPing);
 }

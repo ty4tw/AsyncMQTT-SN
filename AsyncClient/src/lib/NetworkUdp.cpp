@@ -102,28 +102,31 @@ int  Network::unicast(const uint8_t* xmitData, uint16_t dataLen){
 
 
 uint8_t*  Network::getResponce(int* len){
-	uint16_t recvLen = UdpPort::recv(_rxDataBuf, MQTTSN_MAX_PACKET_SIZE, false, &_ipAddress, &_portNo);
-	if(_gwIpAddress && isUnicast() && (_ipAddress != _gwIpAddress) && (_portNo != _gwPortNo)){
-		*len = 0;
-		return 0;
-	}
-
-	if(recvLen < 0){
-		*len = recvLen;
-		return 0;
-	}else{
-		uint8_t pos = 0;
-		if(_rxDataBuf[0] == 0x01){
-			pos++;
+	*len = 0;
+	if (checkRecvBuf()){
+		uint16_t recvLen = UdpPort::recv(_rxDataBuf, MQTTSN_MAX_PACKET_SIZE, false, &_ipAddress, &_portNo);
+		if(_gwIpAddress && isUnicast() && (_ipAddress != _gwIpAddress) && (_portNo != _gwPortNo)){
+			return 0;
 		}
-		if(recvLen != getUint16(_rxDataBuf + pos )){
-			*len = 0;
+
+		if(recvLen < 0){
+			*len = recvLen;
 			return 0;
 		}else{
-			*len = getUint16(_rxDataBuf + pos );
-			return _rxDataBuf;
+			if(_rxDataBuf[0] == 0x01){
+				*len = getUint16(_rxDataBuf + 1 );
+			}else{
+				*len = _rxDataBuf[0];
+			}
+			if(recvLen != *len){
+				*len = 0;
+				return 0;
+			}else{
+				return _rxDataBuf;
+			}
 		}
 	}
+	return 0;
 }
 
 void Network::setGwAddress(void){
@@ -236,7 +239,8 @@ int UdpPort::recvfrom ( uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddre
 	}else{
 		return 0;
 	}
-	memcpy(ipAddressPtr,remoteIp.raw_address(), 4);
+
+	*ipAddressPtr = (const uint32_t)remoteIp;
 	return packLen;
 }
 
@@ -267,7 +271,7 @@ void UdpPort::close(){
 		::close( _sockfdMcast);
 		_sockfdMcast = -1;
 	if(_sockfdUcast > 0){
-			::close( _sockfdUcast);
+		::close( _sockfdUcast);
 			_sockfdUcast = -1;
 		}
 	}
@@ -276,6 +280,13 @@ void UdpPort::close(){
 bool UdpPort::open(UdpConfig config){
 	const int reuse = 1;
 	char loopch = 0;
+
+	uint8_t sav = config.ipAddress[3];
+	config.ipAddress[3] = config.ipAddress[0];
+	config.ipAddress[0] = sav;
+	sav = config.ipAddress[2];
+	config.ipAddress[2] = config.ipAddress[1];
+	config.ipAddress[1] = sav;
 
 	_gPortNo = htons(config.gPortNo);
 	_gIpAddr = getUint32((const uint8_t*)config.ipAddress);
@@ -318,32 +329,24 @@ bool UdpPort::open(UdpConfig config){
 	}
 
 	if(setsockopt(_sockfdUcast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){
-		D_NW("error IP_MULTICAST_LOOP in UdpPort::open\n");
+		D_NWL("error IP_MULTICAST_LOOP in UdpPort::open\n");
 
 		close();
 		return false;
 	}
 
 	if(setsockopt(_sockfdMcast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){
-		D_NW("error IP_MULTICAST_LOOP in UdpPPort::open\n");
+		D_NWL("error IP_MULTICAST_LOOP in UdpPPort::open\n");
 		close();
 		return false;
 	}
 
 	ip_mreq mreq;
 	mreq.imr_interface.s_addr = INADDR_ANY;
-
-	uint8_t sav = config.ipAddress[3];
-	config.ipAddress[3] = config.ipAddress[0];
-	config.ipAddress[0] = sav;
-	sav = config.ipAddress[2];
-	config.ipAddress[2] = config.ipAddress[1];
-	config.ipAddress[1] = sav;
-
-	mreq.imr_multiaddr.s_addr = getUint32((const uint8_t*)config.ipAddress);
+	mreq.imr_multiaddr.s_addr = _gIpAddr;
 
 	if( setsockopt(_sockfdMcast, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq) )< 0){
-		D_NW("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
+		D_NWL("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
 		close();
 		return false;
 	}
@@ -376,7 +379,7 @@ int UdpPort::unicast(const uint8_t* buf, uint32_t length, uint32_t ipAddress, ui
 		for(uint16_t i = 0; i < length ; i++){
 			D_NWL(" %02x", *(buf + i));
 		}
-		D_NW(" ]\n");
+		D_NWL(" ]\n");
 	}
 	return status;
 }
@@ -391,20 +394,22 @@ int UdpPort::multicast( const uint8_t* buf, uint32_t length ){
 	int status = ::sendto( _sockfdMcast, buf, length, 0, (const sockaddr*)&dest, sizeof(dest) );
 	if( status < 0){
 		D_NWL("errno == %d in UdpPort::multicast\n", errno);
+		return errno;
 	}else{
 		D_NWL("sendto %s:%u  [",inet_ntoa(dest.sin_addr),htons(_gPortNo));
 		for(uint16_t i = 0; i < length ; i++){
 			D_NWL(" %02x", *(buf + i));
 		}
 		D_NWL(" ]\n");
+		return status;
 	}
-	return errno;
+
 }
 
 bool UdpPort::checkRecvBuf(){
 	struct timeval timeout;
 	timeout.tv_sec = 0;
-	timeout.tv_usec = 10000;    // 10 msec
+	timeout.tv_usec = 50000;    // 50 msec
 
 	uint8_t buf[2];
 	fd_set recvfds;
@@ -465,7 +470,7 @@ int UdpPort::recvfrom (uint8_t* buf, uint16_t len, int flags, uint32_t* ipAddres
 		for(uint16_t i = 0; i < status ; i++){
 			D_NWL(" %02x", *(buf + i));
 		}
-		D_NW(" ]\n");
+		D_NWL(" ]\n");
 	}else{
 		return 0;
 	}

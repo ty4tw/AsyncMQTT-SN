@@ -36,6 +36,7 @@
         #include <MqttsnClientApp.h>
         #include <GwProxy.h>
         #include <MqttsnClient.h>
+		#include <SoftwareSerial.h>;
 #else
         #include "MqttsnClientApp.h"
         #include "GwProxy.h"
@@ -65,6 +66,9 @@ extern TaskList      theTaskList[];
 extern OnPublishList theOnPublishList[];
 extern MqttsnClient* theCleint;
 extern void test();
+#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
+extern SoftwareSerial debug;
+#endif
 /*=====================================
           MqttsnClient
  ======================================*/
@@ -72,6 +76,9 @@ MqttsnClient* theClient = new MqttsnClient();
 
 #if !defined(ARDUINO) && !defined(MQTTSN_TEST)
 int main(int argc, char** argv){
+#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
+	debug.begin(9600);
+#endif
 	setup();
     loop();
 }

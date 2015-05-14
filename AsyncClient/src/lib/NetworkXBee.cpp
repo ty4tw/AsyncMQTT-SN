@@ -222,7 +222,7 @@ bool SerialPort::send(unsigned char b){
   if (write(_fd, &b,1) != 1){
       return false;
   }else{
-      D_NW( " %x", b);
+      D_NWL( " %x", b);
       return true;
   }
 }
@@ -231,7 +231,7 @@ bool SerialPort::recv(unsigned char* buf){
   if(read(_fd, buf, 1) == 0){
       return false;
   }else{
-	  D_NW( " %x",*buf );
+	  D_NWL( " %x",*buf );
       return true;
   }
 }
@@ -309,13 +309,14 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
         readApiFrame();
 
         if (_available){
-        	D_NW("<=== CheckSum OK\r\n\n");
+        	D_NWA(F("<=== CheckSum OK\r\n\n"));
+        	D_NWL("<=== CheckSum OK\r\n\n");
             if (_responseData[API_ID_POS] == XB_API_RESPONSE){
 				if (_gwAddr16 &&
 					(_responseData[14] & 0x02 ) != 0x02 &&
 					(_gwAddrMsb != getUint32(_responseData + 4) &&
 					(_gwAddrLsb != getUint32(_responseData + 8)))){
-					D_NW("  Sender is not Gateway!\r\n" );
+					D_NWL("  Sender is not Gateway!\r\n" );
 					return false;
 				}
             	return true;
@@ -323,20 +324,21 @@ bool Network::readApiFrame(uint16_t timeoutMillsec){
             	return true;
             }
         }else if (_errorCode == CHECKSUM_ERROR ){
-        	D_MQTTA("  ! CHECKSUM ERROR  MsgType = ");
+        	D_MQTTA(F("  ! CHECKSUM ERROR  MsgType = "));
         	D_MQTTA(_responseData[16], HEX);
-        	D_MQTTA("\r\n");
+        	D_MQTTALN();
         	D_MQTTL("  ! CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
-        	D_NW("<=== CHECKSUM ERROR\r\n");
+        	D_NWA(F("<=== CHECKSUM ERROR\r\n"));
+        	D_NWL("<=== CHECKSUM ERROR\r\n");
             return false;
         }else if (_errorCode){
-        	D_MQTTA("   ! Packet Error Code =" );
+        	D_MQTTA(F("   ! Packet Error Code =") );
 			D_MQTTA(_responseData[16], HEX);
-        	D_MQTTA("\r\n");
+        	D_MQTTALN();
         	D_MQTTL("   ! Packet Error Code = %d\r\n",_errorCode);
-        	D_NWA("<=== Packet Error Code = ");
+        	D_NWA(F("<=== Packet Error Code = "));
         	D_NWA(_errorCode, HEX);
-        	D_NWA("\r\n");
+        	D_NWALN();
 			D_NWL("<=== Packet Error Code = %d\r\n",_errorCode);
 			return false;
         }
@@ -354,7 +356,8 @@ void Network::readApiFrame(){
 
         if ( _byteData == START_BYTE){
             _pos = 1;
-            D_NW("\r\n===> Recv:    ");
+            D_NWA(F("\r\n===> Recv:    "));
+            D_NWL("\r\n===> Recv:    ");
             continue;
         }
 
@@ -412,7 +415,8 @@ int Network:: unicast(const uint8_t* payload, uint16_t payloadLen){
 }
 
 void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
-	D_NW("\r\n===> Send:    ");
+	D_NWA(F("\r\n===> Send:    "));
+	D_NWL("\r\n===> Send:    ");
     uint8_t checksum = 0;
     uint8_t addrBuff[4];
 
@@ -451,7 +455,8 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     sendByte(0x00);   // Option: Use the extended transmission timeout 0x40
     checksum += 0x00;
 
-    D_NW("\r\n     Payload: ");
+    D_NWA(F("\r\n     Payload: "));
+    D_NWL("\r\n     Payload: ");
 
     for ( int i = 0; i < pLen; i++ ){
         sendByte(payload[i]);     // Payload
@@ -459,7 +464,8 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     }
     checksum = 0xff - checksum;
     sendByte(checksum);
-    D_NW("\r\n");
+    D_NWALN();
+    D_NWL("\r\n");
     //flush();
 }
 

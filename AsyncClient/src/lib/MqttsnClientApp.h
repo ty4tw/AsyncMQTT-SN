@@ -42,16 +42,13 @@
 /*----------- Select Platform  ---------*/
 #ifndef ARDUINO
 	#define LINUX
+  //#define CPU_BIGENDIANN
 #endif
-
-/*--------- Select byte order ----------*/
-#define CPU_LITTLEENDIANN
-//#define CPU_BIGENDIANN
-
 
 /*-------- Select Network  -------------*/
 //#define NETWORK_XBEE
-#define NETWORK_UDP
+//#define NETWORK_UDP
+
 #define BROADCAST_ENABLE
 
 
@@ -64,7 +61,7 @@
  *         Debug Flag
  ======================================*/
 //#define DEBUG_NW
-#define DEBUG_MQTTSN
+//#define DEBUG_MQTTSN
 
 
 
@@ -170,38 +167,38 @@ struct UdpAppConfig{
 ========================================*/
 #ifndef DEBUG_NW
 	#define D_NWA(...)
+    #define D_NWALN(...)
 	#define D_NWL(...)
-	#define D_NW(...)
 #endif
 
 #ifndef DEBUG_MQTTSN
 	#define D_MQTTA(...)
+	#define D_MQTTALN(...)
 	#define D_MQTTL(...)
-	#define D_MQTT(...)
 #endif
 
 #if defined(DEBUG_NW) && defined(ARDUINO)
 	#define D_NWA(...)    debug.print(__VA_ARGS__)
+	#define D_NWALN(...)  debug.println(__VA_ARGS__)
 	#define D_NWL(...)
-	#define D_NW(...)     debug.print(__VA_ARGS__)
 #endif
 
 #if defined(DEBUG_NW) && ! defined(ARDUINO)
 	#define D_NWA(...)
+	#define D_NWALN(...)
 	#define D_NWL(...)    printf(__VA_ARGS__)
-	#define D_NW(...)     printf(__VA_ARGS__)
 #endif
 
 #if defined(DEBUG_MQTTSN) && defined(ARDUINO)
     #define D_MQTTA(...)  debug.print(__VA_ARGS__)
+	#define D_MQTTALN(...)  debug.println(__VA_ARGS__)
 	#define D_MQTTL(...)
-	#define D_MQTT(...)   debug.print(__VA_ARGS__)
 #endif
 
 #if defined(DEBUG_MQTTSN) && ! defined(ARDUINO)
 	#define D_MQTTA(...)
+	#define D_MQTTALN(...)
     #define D_MQTTL(...)  printf(__VA_ARGS__)
-	#define D_MQTT(...)   printf(__VA_ARGS__)
 #endif
 
 /*======================================

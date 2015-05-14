@@ -113,6 +113,7 @@ public:
 	void     setKeepAliveDuration(uint16_t duration);
 	void     setAdvertiseDuration(uint16_t duration);
 	int      writeMsg(const uint8_t* msg);
+	void     resetPingReqTimer(void);
 	uint16_t getNextMsgId();
 	TopicTable* getTopicTable(void);
 	RegisterManager* getRegisterManager(void);

@@ -115,6 +115,7 @@ void PublishManager::sendPublish(PubElement* elm){
     memcpy(msg + org + 7, elm->payload->getBuf(), elm->payload->getLen());
 
 	theClient->getGwProxy()->writeMsg(msg);
+	theClient->getGwProxy()->resetPingReqTimer();
     if ( elm->qos == MQTTSN_FLAG_QOS_0){
         remove(elm);  // PUBLISH Done
         return;
@@ -223,9 +224,11 @@ void PublishManager::checkTimeout(void){
 		if ( elm->sendUTC > 0 && elm->sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
 			if (elm->retryCount > 0){
 				sendPublish(elm);
-				D_MQTT("...Timeout retry\r\n");
+				D_MQTTL("...Timeout retry\r\n");
+				D_MQTTA(F("...Timeout retry\r\n"));
 			}else{
-				D_MQTT("...Timeout delete\r\n");
+				D_MQTTA(F("...Timeout delete\r\n"));
+				D_MQTTL("...Timeout delete\r\n");
 				if (elm->next){
 					sav = elm->prev;
 					remove(elm);

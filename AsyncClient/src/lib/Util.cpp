@@ -42,7 +42,24 @@ using namespace std;
 /*=====================================
         Global functions
  ======================================*/
-#ifdef CPU_LITTLEENDIANN
+#ifdef ARDUINO
+int getFreeMemory()
+{
+extern char __bss_end;
+extern char *__brkval;
+
+  int freeMemory;
+
+  if((int)__brkval == 0)
+    freeMemory = ((int)&freeMemory) - ((int)&__bss_end);
+  else
+    freeMemory = ((int)&freeMemory) - ((int)__brkval);
+
+  return freeMemory;
+}
+#endif
+
+#ifndef CPU_BIGENDIANN
 
 /*--- For Little endianness ---*/
 
@@ -94,10 +111,9 @@ void setFloat32(uint8_t* pos, float flt){
     *pos   = val.d[0];
 }
 
-#endif  // CPU_LITTLEENDIANN
+#else
 
 /*--- For Big endianness ---*/
-#ifdef CPU_BIGENDIANN
 
 uint16_t getUint16(const uint8_t* pos){
   uint16_t val = *pos++;
@@ -148,22 +164,8 @@ void setFloat32(uint8_t* pos, float flt){
     *pos   = val.d[3];
 }
 
-#ifdef ARDUINO
-int getFreeMemory()
-{
-extern char __bss_end;
-extern char *__brkval;
+#endif  // CPU_LITTLEENDIANN
 
-  int freeMemory;
 
-  if((int)__brkval == 0)
-    freeMemory = ((int)&freeMemory) - ((int)&__bss_end);
-  else
-    freeMemory = ((int)&freeMemory) - ((int)__brkval);
-
-  return freeMemory;
-}
-#endif
-#endif  // CPU_BIGENDIANN
 
 

@@ -156,6 +156,7 @@ void SubscribeManager::send(SubElement* elm){
     setUint16(msg + 3, elm->msgId);
     
 	theClient->getGwProxy()->writeMsg(msg);
+	theClient->getGwProxy()->resetPingReqTimer();
     elm->sendUTC = Timer::getUnixTime();
     elm->retryCount--;
 }
