@@ -66,6 +66,7 @@ static volatile int theSignaled = 0;
 static void signalHandler(int sig){
 	theSignaled = sig;
 }
+
 #ifdef MQTTSN_TEST
 int main(int argc, char** argv){
 	test();
@@ -275,6 +276,7 @@ const char* Process::getLog(){
 	_mt.unlock();
 	return _rbdata;
 }
+
 
 void Process::resetRingBuffer(){
 	_rb->reset();
