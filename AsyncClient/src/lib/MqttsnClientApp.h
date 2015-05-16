@@ -26,10 +26,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  Created on: 2015/04/15
- *    Modified: 
+ *  Created on: 2015/04/19
+ *    Modified: 2015/05/16
  *      Author: tomoaki
- *     Version: 0.0.1
+ *     Version: 0.1.0
  */
 
 #ifndef MQTTSNCLIENTAPP_H_
@@ -47,6 +47,7 @@
 #ifdef NETWORK_UDP
 #define BROADCAST_ENABLE
 #endif
+
 
 /*--- XBee Buffer Flow Control --*/
 #ifdef NETWORK_XBEE
