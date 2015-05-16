@@ -112,7 +112,7 @@ void PublishManager::sendPublish(PubElement* elm){
         setUint16(msg + org + 3, elm->topicId);
     }
     setUint16(msg + org + 5, elm->msgId);
-    memcpy(msg + org + 7, elm->payload->getBuf(), elm->payload->getLen());
+    memcpy(msg + org + 7, elm->payload->getRowData(), elm->payload->getLen());
 
 	theClient->getGwProxy()->writeMsg(msg);
 	theClient->getGwProxy()->resetPingReqTimer();

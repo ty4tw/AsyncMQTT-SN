@@ -178,7 +178,7 @@ void MqttsnClient::run(void){
 
 
 int tomyAsyncClient::setUTC(Payload* pl){
-	uint32_t utc = getUint32((const uint8_t*)pl->getBuf());
+	uint32_t utc = getUint32((const uint8_t*)pl->getRowData());
 	Timer::setUnixTime(utc);
 	return 0;
 }

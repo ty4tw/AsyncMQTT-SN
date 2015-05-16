@@ -68,6 +68,15 @@ public:
 	Payload();
 	Payload(uint16_t len);
 	~Payload();
+
+/*---------------------------------------------
+  getLen() and getRowData() are
+  minimum required functions of Payload class.
+----------------------------------------------*/
+	uint16_t getLen();       // get data length
+	uint8_t* getRowData();   // get data pointer
+
+/*--- Functions for MessagePack ---*/
 	void init(void);
 	int8_t set_uint32(uint32_t val);
 	int8_t set_int32(int32_t val);
@@ -84,8 +93,6 @@ public:
 
 	void 	 getPayload(uint8_t* payload, uint16_t payloadLen);
 	uint16_t getAvailableLength();
-	uint16_t getLen();
-	uint8_t* getBuf();
 private:
 	uint8_t* getBufferPos(uint8_t index);
 	uint8_t* _buff;

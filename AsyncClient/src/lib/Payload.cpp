@@ -98,7 +98,7 @@ uint16_t Payload::getLen(){
 	return _pos - _buff;
 }
 
-uint8_t* Payload::getBuf(){
+uint8_t* Payload::getRowData(){
 	return _buff;
 }
 

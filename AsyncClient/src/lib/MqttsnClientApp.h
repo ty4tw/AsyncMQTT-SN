@@ -40,11 +40,13 @@
 *****************************************/
 
 /*-------- Select Network  -------------*/
-//#define NETWORK_XBEE
+#if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
+#define NETWORK_XBEE
+#endif
 
-#define NETWORK_UDP
+#ifdef NETWORK_UDP
 #define BROADCAST_ENABLE
-
+#endif
 
 /*--- XBee Buffer Flow Control --*/
 #ifdef NETWORK_XBEE
