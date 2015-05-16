@@ -32,7 +32,7 @@
 #ifndef GATEWAYDEFINES_H_
 #define GATEWAYDEFINES_H_
 
-#define GATEWAY_VERSION "(Ver 1.2.0)"
+#define GATEWAY_VERSION "(Ver 1.2.1)"
 #define GATEWAY_TYPE "AsyncTomyGateway"
 
 #define BROKER      "Broker"
@@ -84,7 +84,6 @@
 /*==========================================================
  *           Light Indicators
  ===========================================================*/
-//#define RASPBERRY_PI
 #define LIGHT_INDICATOR_GREEN   4    // RPi connector 16
 #define LIGHT_INDICATOR_RED     5    // RPi connector 18
 #define LIGHT_INDICATOR_BLUE    6    // RPi connector 22

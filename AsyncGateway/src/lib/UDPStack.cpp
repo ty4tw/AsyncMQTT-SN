@@ -144,6 +144,7 @@ int UDPPort::open(UdpConfig config){
 	const int reuse = 1;
 
 	if(config.uPortNo == 0 || config.gPortNo == 0){
+		D_NWSTACK("error portNo undefined in UDPPort::open\n");
 		return -1;
 	}
 	_gPortNo = htons(config.gPortNo);
@@ -152,6 +153,7 @@ int UDPPort::open(UdpConfig config){
 	/*------ Create unicast socket --------*/
 	_sockfdUnicast = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (_sockfdUnicast < 0){
+		D_NWSTACK("error can't create unicast socket in UDPPort::open\n");
 		return -1;
 	}
 
@@ -163,6 +165,7 @@ int UDPPort::open(UdpConfig config){
 	addru.sin_addr.s_addr = INADDR_ANY;
 
 	if( ::bind ( _sockfdUnicast, (sockaddr*)&addru,  sizeof(addru)) <0){
+		D_NWSTACK("error can't bind unicast socket in UDPPort::open\n");
 		return -1;
 	}
 	if(setsockopt(_sockfdUnicast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){
@@ -174,6 +177,7 @@ int UDPPort::open(UdpConfig config){
 	/*------ Create Multicast socket --------*/
 	_sockfdMulticast = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (_sockfdMulticast < 0){
+		D_NWSTACK("error can't create multicast socket in UDPPort::open\n");
 		close();
 		return -1;
 	}
@@ -186,6 +190,7 @@ int UDPPort::open(UdpConfig config){
 	addrm.sin_addr.s_addr = INADDR_ANY;
 
 	if( ::bind ( _sockfdMulticast, (sockaddr*)&addrm,  sizeof(addrm)) <0){
+		D_NWSTACK("error can't bind multicast socket in UDPPort::open\n");
 		return -1;
 	}
 	if(setsockopt(_sockfdMulticast, IPPROTO_IP, IP_MULTICAST_LOOP,(char*)&loopch, sizeof(loopch)) <0 ){

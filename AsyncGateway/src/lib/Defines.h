@@ -33,8 +33,6 @@
 /*=================================
  *    Network  Selection
  =================================*/
-#define NETWORK_UDP
-
 #if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
 #define NETWORK_XBEE
 #define GATEWAY_NETWORK  "Network is XBee."
@@ -57,7 +55,7 @@
 /*=================================
  *    Debug LOG
  ==================================*/
-#define DEBUG_NWSTACK
+//#define DEBUG_NWSTACK
 
 /*=================================
       Debug Print functions
