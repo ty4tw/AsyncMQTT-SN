@@ -208,7 +208,7 @@ void PublishManager::responce(const uint8_t* msg, uint16_t msglen){
 }
 
 void PublishManager::published(uint8_t* msg, uint16_t msglen){
-    // support QoS0 and Qos1,  QoS2 is not supported
+    // QoS2 is not supported
     if (msg[1] & MQTTSN_FLAG_QOS_1){
         sendPubAck(getUint16(msg + 2), getUint16(msg + 4), MQTTSN_RC_ACCEPTED);
     }

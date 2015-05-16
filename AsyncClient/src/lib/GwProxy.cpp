@@ -316,7 +316,7 @@ int GwProxy::getResponce(void){
 
 uint16_t GwProxy::registerTopic(char* topicName, uint16_t topicId){
     if (topicId){
-        // ToDo  Predefined Topic
+    	_topicTbl.setTopicId("", topicId, MQTTSN_TOPIC_TYPE_PREDEFINED);
     }else{
         uint16_t topicId = _topicTbl.getTopicId(topicName);
         if (topicId == 0){

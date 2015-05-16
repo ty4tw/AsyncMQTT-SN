@@ -153,7 +153,7 @@ TopicTable::~TopicTable(){
 Topic* TopicTable::getTopic(char* topic){
 	Topic* p = _first;
 	while(p){
-		if (strcmp(p->_topicStr, topic) == 0){
+		if (p->_topicStr != 0 && strcmp(p->_topicStr, topic) == 0){
 			return p;
 		}
 		p = p->_next;
@@ -227,7 +227,7 @@ int TopicTable::execCallback(uint16_t  topicId, Payload* payload, uint8_t topicT
 
 Topic* TopicTable::add(char* topicName, uint16_t id, uint8_t type, TopicCallback callback, uint8_t alocFlg){
     Topic* elm;
-    if (*topicName){
+    if (topicName){
 	    elm = getTopic(topicName);
     }else{
         elm = getTopic(id, type);

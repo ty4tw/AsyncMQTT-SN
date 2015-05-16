@@ -73,7 +73,7 @@ struct OnPublishList{
 };
 
 #define GETUTC() Timer::getUnixTime()
-int setUTC(void*);
+int setUTC(Payload*);
 /*========================================
        Class MqttsnClient
  =======================================*/

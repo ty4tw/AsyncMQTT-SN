@@ -36,19 +36,13 @@
 #define MQTTSNCLIENTAPP_H_
 
 /****************************************
-      Select Platform and Network
+      Select Network
 *****************************************/
-
-/*----------- Select Platform  ---------*/
-#ifndef ARDUINO
-	#define LINUX
-  //#define CPU_BIGENDIANN
-#endif
 
 /*-------- Select Network  -------------*/
 //#define NETWORK_XBEE
-//#define NETWORK_UDP
 
+#define NETWORK_UDP
 #define BROADCAST_ENABLE
 
 
@@ -62,8 +56,6 @@
  ======================================*/
 //#define DEBUG_NW
 //#define DEBUG_MQTTSN
-
-
 
 /****************************************
       MQTT-SN Parameters
@@ -82,6 +74,14 @@
 #define MQTTSN_TIME_RETRY           10
 #define MQTTSN_TIME_WAIT           300     //  5min
 #define MQTTSN_RETRY_COUNT           5
+
+/****************************************
+            Platform
+*****************************************/
+#ifndef ARDUINO
+	#define LINUX
+  //#define CPU_BIGENDIANN
+#endif
 
 /****************************************
       Application config structures

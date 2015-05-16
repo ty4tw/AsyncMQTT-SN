@@ -34,7 +34,7 @@ PROG := $(OUTDIR)/$(PROGNAME)
 OBJS := $(SRCS:%.cpp=$(OUTDIR)/%.o)
 DEPS := $(SRCS:%.cpp=$(OUTDIR)/%.d)
 
-.PHONY: install clean distclean
+.PHONY: install clean distclean start stop
 
 all: $(PROG)
 
@@ -51,4 +51,11 @@ clean:
 	rm -rf $(OUTDIR)
 
 install:
+	rm ../../$(PROG)
 	cp -p $(PROG) ../../
+	
+start:
+    sudo systemctl start tomygateway.service
+    
+stop:
+	sudo systemctl stop tomygateway.service

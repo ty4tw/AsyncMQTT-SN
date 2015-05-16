@@ -66,6 +66,7 @@ extern TaskList      theTaskList[];
 extern OnPublishList theOnPublishList[];
 extern MqttsnClient* theCleint;
 extern void test();
+extern uint32_t getUint32(const uint8_t*);
 #if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
 extern SoftwareSerial debug;
 #endif
@@ -176,17 +177,22 @@ void MqttsnClient::run(void){
 }
 
 
-int setUTC(uint32_t* utc){
-	Timer::setUnixTime(*utc);
+int tomyAsyncClient::setUTC(Payload* pl){
+	uint32_t utc = getUint32((const uint8_t*)pl->getBuf());
+	Timer::setUnixTime(utc);
 	return 0;
 }
 
 
 void MqttsnClient::onConnect(void){
+
 	/*
-	_gwProxy.getTopicTable()->add(0, MQTTSN_TOPICID_PREDEFINED_TIME, MQTTSN_TOPIC_TYPE_PREDEFINED, setUTC);
+	 *    subscribe() for Predefined TopicId
+	 */
+    #ifdef ARDUINO
 	subscribe(MQTTSN_TOPICID_PREDEFINED_TIME, setUTC, 0, MQTTSN_TOPIC_TYPE_PREDEFINED);
-	*/
+    #endif
+
 	for(uint8_t i = 0; theOnPublishList[i].pubCallback; i++){
 		subscribe(theOnPublishList[i].topic, theOnPublishList[i].pubCallback, theOnPublishList[i].qos);
 	}
