@@ -190,6 +190,10 @@ int GwProxy::getConnectResponce(void){
 	return 1;
 }
 
+void GwProxy::reconnect(void){
+	D_MQTTL("...Gateway Lost\r\n");
+	_status = GW_LOST;
+}
 
 void GwProxy::disconnect(uint16_t secs){
     _tSleep = secs;
