@@ -51,11 +51,13 @@ clean:
 	rm -rf $(OUTDIR)
 
 install:
-	rm ../../$(PROG)
+	rm ../../$(PROGNAME)
 	cp -p $(PROG) ../../
 	
 start:
-    sudo systemctl start tomygateway.service
-    
+	sudo systemctl start tomygateway.service
+	
 stop:
 	sudo systemctl stop tomygateway.service
+	
+	
