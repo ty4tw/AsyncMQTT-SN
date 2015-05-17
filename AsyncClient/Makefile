@@ -6,9 +6,9 @@ SRCS := $(SRCDIR)/Application.cpp \
 $(SUBDIR)/GwProxy.cpp \
 $(SUBDIR)/MqttsnClient.cpp \
 $(SUBDIR)/NetworkUdp.cpp \
-$(SUBDIR)/zbeeNetworkXBeeStack.cpp \
+$(SUBDIR)/NetworkXBee.cpp \
 $(SUBDIR)/Payload.cpp \
-$(SUBDIR)/PubblishManager.cpp \
+$(SUBDIR)/PublishManager.cpp \
 $(SUBDIR)/RegisterManager.cpp \
 $(SUBDIR)/SubscribeManager.cpp \
 $(SUBDIR)/TaskManager.cpp \
