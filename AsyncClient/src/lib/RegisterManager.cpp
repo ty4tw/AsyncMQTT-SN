@@ -220,7 +220,11 @@ uint8_t  RegisterManager::checkTimeout(void){
 				if (elm->next){
 					sav = elm->prev;
 					remove(elm);
-					elm = sav;
+					if(sav){
+						elm = sav;
+					}else{
+						break;
+					}
 				}else{
 					remove(elm);
 					break;

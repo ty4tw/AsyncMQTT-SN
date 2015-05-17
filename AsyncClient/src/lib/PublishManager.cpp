@@ -233,7 +233,11 @@ void PublishManager::checkTimeout(void){
 					sav = elm->prev;
 					remove(elm);
 					theClient->getGwProxy()->reconnect();
-					elm = sav;
+					if(sav){
+						elm = sav;
+					}else{
+						break;
+					}
 				}else{
 					remove(elm);
 					theClient->getGwProxy()->reconnect();

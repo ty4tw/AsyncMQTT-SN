@@ -191,8 +191,8 @@ int GwProxy::getConnectResponce(void){
 }
 
 void GwProxy::reconnect(void){
-	D_MQTTL("...Gateway Lost\r\n");
-	_status = GW_LOST;
+	D_MQTTL("...Gateway reconnect\r\n");
+	_status = GW_DISCONNECTED;
 }
 
 void GwProxy::disconnect(uint16_t secs){
