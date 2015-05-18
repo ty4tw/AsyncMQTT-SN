@@ -200,10 +200,10 @@ void MqttsnClient::onConnect(void){
 
 void MqttsnClient::indicator(bool onOff){
 #ifdef ARDUINO
-	if (onnoff){
-		digitalWrite(13,1);
+	if (onOff){
+		digitalWrite(ARDUINO_LED_PIN, 1);
 	}else{
-		 digitalWrite(13,0);
+		digitalWrite(ARDUINO_LED_PIN, 0);
 	}
 #else
 	if (onOff){
