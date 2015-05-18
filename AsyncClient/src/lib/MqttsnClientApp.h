@@ -40,7 +40,7 @@
 *****************************************/
 
 /*-------- Select Network  -------------*/
-//#define NETWORK_UDP
+#define NETWORK_UDP
 
 
 #if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
@@ -168,6 +168,8 @@ struct UdpAppConfig{
 #define SUBSCRIBE_LIST    OnPublishList theOnPublishList[]
 #define SUB(...)          {__VA_ARGS__}
 #define END_OF_SUBSCRIBE_LIST {0,0,0}
+
+#define INDICATOR_ON(...)   theClient->indicator(__VA_ARGS__)
 /*======================================
       MACROs for debugging
 ========================================*/

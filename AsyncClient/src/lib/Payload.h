@@ -78,6 +78,7 @@ public:
 
 /*--- Functions for MessagePack ---*/
 	void init(void);
+	int8_t set_bool(bool val);
 	int8_t set_uint32(uint32_t val);
 	int8_t set_int32(int32_t val);
 	int8_t set_float(float val);
@@ -85,6 +86,7 @@ public:
 	int8_t set_str(const char* val);
 	int8_t set_array(uint8_t val);
 
+	bool    get_bool(uint8_t index);
 	uint8_t getArray(uint8_t index);
 	uint32_t get_uint32(uint8_t index);
 	int32_t  get_int32(uint8_t index);

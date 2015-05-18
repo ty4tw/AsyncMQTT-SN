@@ -198,6 +198,23 @@ void MqttsnClient::onConnect(void){
 	}
 }
 
+void MqttsnClient::indicator(bool onOff){
+#ifdef ARDUINO
+	if (onnoff){
+		digitalWrite(13,1);
+	}else{
+		 digitalWrite(13,0);
+	}
+#else
+	if (onOff){
+		printf(" ===> Indicator ON\n");
+	}else{
+		printf(" ===> Indicator OFF\n");
+	}
+#endif
+}
+
+
 /*
 #ifdef ARDUINO
 int MqttsnClient::sleep(void){
@@ -226,4 +243,6 @@ int MqttsnClient::sleep(void){
     return 0;
 }
 //#endif
+
+
 

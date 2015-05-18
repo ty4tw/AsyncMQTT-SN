@@ -31,26 +31,33 @@
  *      Author: tomoaki
  *     Version: 0.1.0
  */
-#ifdef ARDUINO
-#include <SoftwareSerial.h>
-#include <lib/MqttsnClientApp.h>
-#include <lib/MqttsnClient.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EthernetClient.h>
 #include <EthernetUdp.h>
-#else
-#include "lib/MqttsnClientApp.h"
-#include "lib/MqttsnClient.h"
-#endif
 
-#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
+#include <Payload.h>
+#include <NetworkXBee.h>
+#include <MqttsnClient.h>
+#include <SubscribeManager.h>
+#include <RegisterManager.h>
+#include <TopicTable.h>
+#include <TaskManager.h>
+#include <NetworkUdp.h>
+#include <PublishManager.h>
+#include <Timer.h>
+#include <MqttsnClientApp.h>
+#include <GwProxy.h>
+
+#include <SoftwareSerial.h>
+
+#if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
 SoftwareSerial debug(8, 9);
 #endif
 
 using namespace std;
 using namespace tomyAsyncClient;
 extern MqttsnClient* theClient;
-
 /*============================================
  *
  *      MQTT-SN Client Application
@@ -62,7 +69,7 @@ extern MqttsnClient* theClient;
     	"client01",     //ClientId
         57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
-        "/dev/ttyUSB0"               //Device (for linux App)
+        0               //Device (for linux App)
     },
     {
         300,            //KeepAlive
@@ -77,12 +84,12 @@ extern MqttsnClient* theClient;
 #ifdef NETWORK_UDP
 UDP_APP_CONFIG = {
     {
-      	"LinuxClient",      //ClientId
-        {225,1,1,1},        // Multicast group IP
-        1883,               // Multicast group Port
-        {0,0,0,0},          // Local IP     (for Arduino App)
-        12001,              // Local PortNo
-        {0,0,0,0,0,0}       // MAC address  (for Arduino App)
+        "ArduinoEther",
+        {225,1,1,1},         // Multicast group IP
+        1883,                // Multicast group Port
+        {192,168,11,18},     // Local IP     (for Arduino App)
+        12001,               // Local PortNo
+        {0x90,0xa2,0xda,0x0f,0x53,0xa5}       // MAC address  (for Arduino App)
     },
     {
         300,            //KeepAlive
@@ -106,22 +113,17 @@ const char* topic2 = "xxxx/onoff/linux";
 static bool onoffFlg = true;
 
 void task1(void){
-  printf("TASK1 invoked\n");
   Payload* pl = new Payload(10);
   onoffFlg = !onoffFlg;
   pl->set_bool(onoffFlg);
-  PUBLISH(topic1,pl,1);
+  PUBLISH(topic2,pl,1);
 }
 
-void task2(void){
-  printf("TASK2 invoked\n");
-}
 
 /*---------------  List of task invoked by Timer ------------*/
 
 TASK_LIST = {  //TASK( const char* topic, executing duration in second),
              TASK(task1,2),
-             TASK(task2,20),
              END_OF_TASK_LIST
             };
 
@@ -130,15 +132,14 @@ TASK_LIST = {  //TASK( const char* topic, executing duration in second),
  *------------------------------------------------------*/
 
 int on_publish(Payload* payload){
-    printf("ON_PUBLISH invoked. ===>  ");
-    INDICATOR_ON(payload->get_bool(1));
+    INDICATOR_ON(payload->get_bool(0));
     return 0;
 }
 
 /*------------ Link Callback to Topic -------------*/
 
 SUBSCRIBE_LIST = {  //SUB(topic, on_publish, QoS),
-                  SUB(topic2, on_publish, 1),
+                  SUB(topic1, on_publish, 1),
                   END_OF_SUBSCRIBE_LIST
                  };
 
@@ -153,8 +154,9 @@ void interruptCallback(void){
  *            setup() function
  *------------------------------------------------------*/
  void setup(void){
-
+  pinMode(ARDUINO_LED_PIN, OUTPUT);
  }
+
 
 
 

@@ -98,6 +98,7 @@ public:
     SubscribeManager* getSubscribeManager(void);
     RegisterManager*  getRegisterManager(void);
     TopicTable*       getTopicTable(void);
+    void indicator(bool onoff);
 private:
     TaskManager      _taskMgr;
     PublishManager   _pubMgr;

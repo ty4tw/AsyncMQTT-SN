@@ -199,6 +199,18 @@ int8_t Payload::set_array(uint8_t val){
 	return 0;
 }
 
+int8_t Payload::set_bool(bool val){
+	if (getAvailableLength() < 1){
+			return -1;
+	}
+	if (val){
+		*_pos++ = MSGPACK_TRUE;
+	}else {
+		*_pos++ = MSGPACK_FALSE;
+	}
+	_elmCnt++;
+	return 0;
+}
 /*======================
  *     getter
  ======================*/
@@ -213,6 +225,15 @@ uint8_t Payload::getArray(uint8_t index){
 		}
 	}
 	return rc;
+}
+
+bool Payload::get_bool(uint8_t index){
+	uint8_t* val = getBufferPos(index);
+	if (*val == MSGPACK_FALSE){
+		return false;
+	}else{
+		return true;
+	}
 }
 
 uint32_t Payload::get_uint32(uint8_t index){
