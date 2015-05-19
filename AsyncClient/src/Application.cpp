@@ -32,7 +32,6 @@
  *     Version: 0.1.0
  */
 #ifdef ARDUINO
-#include <SoftwareSerial.h>
 #include <lib/MqttsnClientApp.h>
 #include <lib/MqttsnClient.h>
 #include <SPI.h>
@@ -44,6 +43,7 @@
 #endif
 
 #if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
+#include <SoftwareSerial.h>
 SoftwareSerial debug(8, 9);
 #endif
 
@@ -130,8 +130,8 @@ TASK_LIST = {  //TASK( const char* topic, executing duration in second),
  *------------------------------------------------------*/
 
 int on_publish(Payload* payload){
-    printf("ON_PUBLISH invoked. ===>  ");
-    INDICATOR_ON(payload->get_bool(1));
+    printf("ON_PUBLISH invoked.  ");
+    INDICATOR_ON(payload->get_bool(0));
     return 0;
 }
 
