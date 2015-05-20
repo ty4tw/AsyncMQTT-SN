@@ -141,7 +141,7 @@ void GwProxy::connect(){
           #else
 			// UDP without multicast
             _status = GW_CONNECTING;
-            _network.setGwAddress();
+            _network.setFixedGwAddress();
 		  #endif
 		}
 		getConnectResponce();

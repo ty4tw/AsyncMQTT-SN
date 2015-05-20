@@ -62,12 +62,12 @@ extern MqttsnClient* theClient;
     	"client01",     //ClientId
         57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
-        "/dev/ttyUSB0"               //Device (for linux App)
+        "/dev/ttyUSB0"  //Device (for linux App)
     },
     {
         300,            //KeepAlive
         true,           //Clean session
-        false,           //EndDevice
+        false,          //EndDevice
         "willTopic",    //WillTopic   or 0   DO NOT USE NULL STRING "" !
         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
     }
@@ -92,23 +92,7 @@ UDP_APP_CONFIG = {
         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
     }
 };
- UDP_APP_CONFIG = {
-     {
-       	"LinuxClient",      //ClientId
-         {192,168,11,21},        // Multicast group IP
-         2000,               // Multicast group Port
-         {0,0,0,0},          // Local IP     (for Arduino App)
-         12001,              // Local PortNo
-         {0,0,0,0,0,0}       // MAC address  (for Arduino App)
-     },
-     {
-         300,            //KeepAlive
-         true,           //Clean session
-         false,          //EndDevice
-         "willTopic",    //WillTopic   or 0   DO NOT USE NULL STRING "" !
-         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
-     }
- };
+
 #endif
 
 /*------------------------------------------------------

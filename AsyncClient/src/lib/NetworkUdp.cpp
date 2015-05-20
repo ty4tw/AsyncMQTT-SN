@@ -340,7 +340,7 @@ bool UdpPort::open(UdpConfig config){
 		close();
 		return false;
 	}
-
+#ifdef BROADCAST_ENABLE
 	ip_mreq mreq;
 	mreq.imr_interface.s_addr = INADDR_ANY;
 	mreq.imr_multiaddr.s_addr = _gIpAddr;
@@ -350,6 +350,7 @@ bool UdpPort::open(UdpConfig config){
 		close();
 		return false;
 	}
+#endif
 /*
 	if( setsockopt(_sockfdUcast, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq) )< 0){
 		D_NW("error IP_ADD_MEMBERSHIP in UdpPort::open\n");
