@@ -24,10 +24,11 @@ CPPFLAGS +=
 DEFS :=
 LDFLAGS += 
 LIBS +=
-LDADD := -lpthread -lrt -lwiringPi -lssl -lcrypto
+LDADD := -lpthread -lrt -lssl -lcrypto
 
 CXXFLAGS := -Wall -O3
-
+RPI := no
+LDPI := -lwiringPi
 OUTDIR := Build
 
 PROG := $(OUTDIR)/$(PROGNAME)
@@ -36,12 +37,16 @@ DEPS := $(SRCS:%.cpp=$(OUTDIR)/%.d)
 
 .PHONY: install clean distclean start stop
 
-all: $(PROG)
+all: $(PROG)                                                                                                                                                                                                                                                                                                                                                                                                                               
 
 -include $(DEPS)
 
 $(PROG): $(OBJS)
+ifeq ($(RPI),no)
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS) $(LDADD)
+else
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS) $(LDADD) $(LDPI)
+endif
 
 $(OUTDIR)/%.o:%.cpp
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
@@ -51,8 +56,7 @@ clean:
 	rm -rf $(OUTDIR)
 
 install:
-	rm ../../$(PROGNAME)
-	cp -p $(PROG) ../../
+	cp -pf $(PROG) ../../
 	
 start:
 	sudo systemctl start tomygateway.service

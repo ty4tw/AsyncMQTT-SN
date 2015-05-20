@@ -51,5 +51,5 @@ distclean:
 	rm -rf Build
 	
 install:
-	cp -p $(PROG) ../../
+	cp -pf $(PROG) ../../
 	
