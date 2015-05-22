@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  *  Created on: 2015/05/01
- *    Modified:
+ *    Modified: 2015/05/16
  *      Author: Tomoaki YAMAGUCHI
- *     Version: 0.0.0
+ *     Version: 0.1.0
  */
 #ifndef  DEFINES_H_
 #define  DEFINES_H_
@@ -55,7 +55,7 @@
 /*=================================
  *    Debug LOG
  ==================================*/
-//#define DEBUG_NWSTACK
+#define DEBUG_NWSTACK
 
 /*=================================
       Debug Print functions

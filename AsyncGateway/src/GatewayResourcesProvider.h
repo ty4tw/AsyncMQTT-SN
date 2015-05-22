@@ -104,6 +104,8 @@ public:
 	MQTTSnMessage* getClientSleepMessage();
 	void eraseWaitedPubTopicId(uint16_t msgId);
 	void eraseWaitedSubTopicId(uint16_t msgId);
+	void clearWaitedPubTopicId(void);
+	void clearWaitedSubTopicId(void);
 
 	void setBrokerSendMessage(MQTTMessage*);
 	void setBrokerRecvMessage(MQTTMessage*);

@@ -628,6 +628,8 @@ void GatewayControlTask::handleSnConnect(Event* ev, ClientNode* clnode, MQTTSnMe
 			clnode->setTopics(topics);
 			mqMsg->setCleanSessionFlg();
 		}
+		clnode->clearWaitedPubTopicId();
+		clnode->clearWaitedSubTopicId();
 	}
 
 	if(sConnect->isWillRequired()){
@@ -813,7 +815,7 @@ void GatewayControlTask::handlePuback(Event* ev, ClientNode* clnode, MQTTMessage
 		_res->getClientSendQue()->post(ev1);
 		return;
 	}
-	LOGWRITE("PUBACK MessageID is not the same as PUBLISH or PUBACK is not expected\n");
+	LOGWRITE(" ClientID : %s PUBACK MessageID is not the same as PUBLISH or PUBACK is not expected.\n", clnode->getNodeId());
 }
 
 /*-------------------------------------------------------

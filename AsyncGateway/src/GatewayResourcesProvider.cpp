@@ -169,6 +169,14 @@ void ClientNode::eraseWaitedSubTopicId(uint16_t msgId){
 	_waitedSubTopicIdMap.erase(msgId);
 }
 
+void ClientNode::clearWaitedPubTopicId(void){
+	_waitedPubTopicIdMap.clear();
+}
+
+void ClientNode::clearWaitedSubTopicId(void){
+	_waitedSubTopicIdMap.clear();
+}
+
 
 uint16_t ClientNode::getNextMessageId(){
 	_msgId++;

@@ -23,16 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- *  Created on: 2015/05/01
- *    Modified:
- *      Author: Tomoaki YAMAGUCHI
- *     Version: 0.0.0
  */
 
 #ifndef GATEWAYDEFINES_H_
 #define GATEWAYDEFINES_H_
 
-#define GATEWAY_VERSION "(Ver 1.2.1)"
+#define GATEWAY_VERSION "(Ver 1.2.2)"
 #define GATEWAY_TYPE "AsyncTomyGateway"
 
 #define BROKER      "Broker"
