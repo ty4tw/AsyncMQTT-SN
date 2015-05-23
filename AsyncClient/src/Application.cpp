@@ -62,13 +62,13 @@ extern MqttsnClient* theClient;
     	"client01",     //ClientId
         57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
-        "/dev/ttyUSB0"  //Device (for linux App)
+        "/dev/ttyUSB0"               //Device (for linux App)
     },
     {
         300,            //KeepAlive
         true,           //Clean session
         false,          //EndDevice
-        "willTopic",    //WillTopic   or 0   DO NOT USE NULL STRING "" !
+        "ty4tw@github/willTopic",    //WillTopic   or 0   DO NOT USE NULL STRING "" !
         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
     }
  };
@@ -92,14 +92,13 @@ UDP_APP_CONFIG = {
         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
     }
 };
-
 #endif
 
 /*------------------------------------------------------
  *             Create Topic
  *------------------------------------------------------*/
-const char* topic1 = "xxxx/onoff/arduino";
-const char* topic2 = "xxxx/onoff/linux";
+const char* topic1 = "ty4tw@github/onoff/arduino";
+const char* topic2 = "ty4tw@github/onoff/linux";
 /*------------------------------------------------------
  *             Tasks invoked by Timer
  *------------------------------------------------------*/

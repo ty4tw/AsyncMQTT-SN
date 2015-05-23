@@ -254,7 +254,9 @@ void SubscribeManager::responce(const uint8_t* msg){
         if (rc == 0){
             TopicTable* tt = theClient->getGwProxy()->getTopicTable();
             SubElement* elm = getElement(msgId);
-            tt->add((char*)elm->topicName, topicId, elm->topicType, elm->callback);
+            if (elm){
+            	tt->add((char*)elm->topicName, topicId, elm->topicType, elm->callback);
+            }
         }
         remove(getElement(msgId));
     }else{

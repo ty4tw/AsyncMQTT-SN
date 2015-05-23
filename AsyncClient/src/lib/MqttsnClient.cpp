@@ -37,6 +37,8 @@
         #include <GwProxy.h>
         #include <MqttsnClient.h>
 		#include <SoftwareSerial.h>;
+		#include <LowPower.h>
+		#include <Timer.h>
 #else
         #include "MqttsnClientApp.h"
         #include "GwProxy.h"
@@ -215,34 +217,46 @@ void MqttsnClient::indicator(bool onOff){
 }
 
 
-/*
+
 #ifdef ARDUINO
+
+//https://github.com/LowPowerLab/LowPower
+
+
+
 int MqttsnClient::sleep(void){
 	// Enter idle state for 8 s with the rest of peripherals turned off
 	// Each microcontroller comes with different number of peripherals
 	// Comment off line of code where necessary
 
+#define SLEEP_TIME SLEEP_1S
+	uint32_t sec = 1;
+
 	// ATmega328P, ATmega168
-	LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
+	LowPower.idle(SLEEP_TIME, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
 				SPI_OFF, USART0_OFF, TWI_OFF);
+	Timer::setUnixTime(Timer::getUnixTime() + sec);
 
 	// ATmega32U4
-	//LowPower.idle(SLEEP_8S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF,
+	//LowPower.idle(SLEEP_TIME, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF,
 	//		  TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+	//Timer::setUnixTime(Timer::getUnixTime() + sec);
 
 	// ATmega2560
-	//LowPower.idle(SLEEP_8S, ADC_OFF, TIMER5_OFF, TIMER4_OFF, TIMER3_OFF,
+	//LowPower.idle(SLEEP_TIME, ADC_OFF, TIMER5_OFF, TIMER4_OFF, TIMER3_OFF,
 	//		  TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART3_OFF,
 	//		  USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
+	//Timer::setUnixTime(Timer::getUnixTime() + sec);
 	return 0;
 }
 
 #else
-*/
+
 int MqttsnClient::sleep(void){
     return 0;
 }
-//#endif
+
+#endif
 
 
 

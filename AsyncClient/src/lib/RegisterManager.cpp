@@ -183,11 +183,13 @@ void RegisterManager::registerTopic(char* topicName){
 
 void RegisterManager::responceRegAck(uint16_t msgId, uint16_t topicId){
 	const char* topicName = getTopic(msgId);
-	uint8_t topicType = strlen((char*)topicName) > 2 ? MQTTSN_TOPIC_TYPE_NORMAL : MQTTSN_TOPIC_TYPE_SHORT;
-	theClient->getGwProxy()->getTopicTable()->setTopicId((char*)topicName, topicId, topicType);  // Add Topic to TopicTable
-	RegQueElement* elm = getElement(msgId);
-	remove(elm);
-	theClient->getPublishManager()->sendSuspend((char*)topicName, topicId, topicType );
+	if (topicName){
+		uint8_t topicType = strlen((char*)topicName) > 2 ? MQTTSN_TOPIC_TYPE_NORMAL : MQTTSN_TOPIC_TYPE_SHORT;
+		theClient->getGwProxy()->getTopicTable()->setTopicId((char*)topicName, topicId, topicType);  // Add Topic to TopicTable
+		RegQueElement* elm = getElement(msgId);
+		remove(elm);
+		theClient->getPublishManager()->sendSuspend((char*)topicName, topicId, topicType );
+	}
 }
 
 void RegisterManager::responceRegister(uint8_t* msg, uint16_t msglen){
