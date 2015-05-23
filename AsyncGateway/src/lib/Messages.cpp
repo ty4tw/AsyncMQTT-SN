@@ -619,6 +619,10 @@ void MQTTSnPublish::setDup(){
 	setFlags(_flags);
 }
 
+bool  MQTTSnPublish::isDup(void){
+	return (_flags & 0x80);
+}
+
 void MQTTSnPublish::setRetain(){
 	_flags |= 0x10;
 	setFlags(_flags);
@@ -1767,3 +1771,6 @@ bool MQTTPublish::deserialize(uint8_t* buf){
 	return true;
 }
 
+bool MQTTPublish::isDup(void){
+	return (_flags & 0x08);
+}

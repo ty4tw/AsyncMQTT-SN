@@ -265,12 +265,15 @@ void GatewayControlTask::run(){
  *               Upstream MQTTSnPublish
  -------------------------------------------------------*/
 void GatewayControlTask::handleSnPublish(Event* ev, ClientNode* clnode, MQTTSnMessage* msg){
-
-	LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
-
 	MQTTSnPublish* sPublish = new MQTTSnPublish();
 	MQTTPublish* mqMsg = new MQTTPublish();
 	sPublish->absorb(msg);
+
+	if (sPublish->isDup()){
+		LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBLISH +", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	}else{
+		LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	}
 
 	Topic* tp = clnode->getTopics()->getTopic(sPublish->getTopicId(), sPublish->getTopicType());
 
@@ -633,6 +636,7 @@ void GatewayControlTask::handleSnConnect(Event* ev, ClientNode* clnode, MQTTSnMe
 	}
 
 	if(sConnect->isWillRequired()){
+		clnode->getStack()->disconnect(); // close socket
 		MQTTSnWillTopicReq* reqTopic = new MQTTSnWillTopicReq();
 		Event* evwr = new Event();
 
@@ -1057,9 +1061,13 @@ void GatewayControlTask::handlePublish(Event* ev, ClientNode* clnode, MQTTMessag
 			_res->getBrokerSendQue()->post(ev1);
 		}
 	}else if(clnode->isActive()){
-		clnode->setClientSendMessage(snMsg);
-		LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+		if (snMsg->isDup()){
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH +", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+		}else{
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+		}
 
+		clnode->setClientSendMessage(snMsg);
 		Event* ev1 = new Event();
 		ev1->setClientSendEvent(clnode);
 		_res->getClientSendQue()->post(ev1);

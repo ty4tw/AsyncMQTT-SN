@@ -402,6 +402,7 @@ public:
     string*  getTopic(string* str);
     uint8_t  getTopicType();
     uint8_t  getQos();
+    bool     isDup();
     uint8_t  getFlags();
     uint8_t* getData();
     uint16_t getDataLength();
@@ -859,6 +860,7 @@ public:
 	uint16_t getMessageId();
 	uint8_t* getPayload();
 	uint8_t  getPayloadLength();
+	bool     isDup(void);
 
 	uint16_t serialize(uint8_t* buf);
 	bool deserialize(uint8_t* buf);

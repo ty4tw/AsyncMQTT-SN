@@ -179,8 +179,11 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 				LOGWRITE("%s ill-formed UTF-8\n",currentDateTime());
 			}
 			publish->serialize(sbuff);
-			LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, BROKER, msgPrint(sbuff, publish));
-
+			if (publish->isDup()){
+				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH +", LEFTARROW, BROKER, msgPrint(sbuff, publish));
+			} else {
+				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, BROKER, msgPrint(sbuff, publish));
+			}
 			clnode->setBrokerRecvMessage(publish);
 
 		}else if((*packet & 0xf0) == MQTT_TYPE_SUBACK){

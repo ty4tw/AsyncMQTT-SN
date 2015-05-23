@@ -86,7 +86,11 @@ void BrokerSendTask::run(){
 		if(srcMsg->getType() == MQTT_TYPE_PUBLISH){
 			MQTTPublish* msg = static_cast<MQTTPublish*>(srcMsg);
 			length = msg->serialize(_buffer);
-			LOGWRITE(BLUE_FORMAT, currentDateTime(), "PUBLISH", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+			if (msg->isDup()){
+				LOGWRITE(BLUE_FORMAT, currentDateTime(), "PUBLISH +", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+			} else {
+				LOGWRITE(BLUE_FORMAT, currentDateTime(), "PUBLISH", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+			}
 			send(clnode, length);
 
 		}else if(srcMsg->getType() == MQTT_TYPE_PUBACK){
