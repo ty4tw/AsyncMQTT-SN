@@ -134,6 +134,7 @@ void Network::readApiFrame(void){
 
         if ( _byteData == START_BYTE){
             _pos = 1;
+            _checksumTotal = 0;
             D_NWSTACK("\r\n===> Recv:    ");
             continue;
         }

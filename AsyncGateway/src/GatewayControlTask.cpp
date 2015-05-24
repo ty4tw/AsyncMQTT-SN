@@ -804,7 +804,7 @@ void GatewayControlTask::handlePuback(Event* ev, ClientNode* clnode, MQTTMessage
 
 	MQTTPubAck* mqMsg = static_cast<MQTTPubAck*>(msg);
 
-	LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBACK", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(mqMsg));
+	LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBACK", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(mqMsg));
 
 	uint16_t topicId = clnode->getWaitedPubTopicId(mqMsg->getMessageId());
 	if(topicId){
@@ -828,7 +828,7 @@ void GatewayControlTask::handlePubRec(Event* ev, ClientNode* clnode, MQTTMessage
 	MQTTSnPubRec* snMsg = new MQTTSnPubRec();
 	MQTTPubRec* mqMsg = static_cast<MQTTPubRec*>(msg);
 	snMsg->setMsgId(mqMsg->getMessageId());
-	LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBREC", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+	LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBREC", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 	clnode->setClientSendMessage(snMsg);
 
 	Event* ev1 = new Event();
@@ -843,7 +843,7 @@ void GatewayControlTask::handlePubRel(Event* ev, ClientNode* clnode, MQTTMessage
 	MQTTSnPubRel* snMsg = new MQTTSnPubRel();
 	MQTTPubRel* mqMsg = static_cast<MQTTPubRel*>(msg);
 	snMsg->setMsgId(mqMsg->getMessageId());
-	LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBREL", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+	LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBREL", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 	clnode->setClientSendMessage(snMsg);
 
 	Event* ev1 = new Event();
@@ -858,7 +858,7 @@ void GatewayControlTask::handlePubComp(Event* ev, ClientNode* clnode, MQTTMessag
 	MQTTSnPubComp* snMsg = new MQTTSnPubComp();
 	MQTTPubComp* mqMsg = static_cast<MQTTPubComp*>(msg);
 	snMsg->setMsgId(mqMsg->getMessageId());
-	LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBCOMP", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+	LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBCOMP", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 	clnode->setClientSendMessage(snMsg);
 
 	Event* ev1 = new Event();
@@ -1046,7 +1046,7 @@ void GatewayControlTask::handlePublish(Event* ev, ClientNode* clnode, MQTTMessag
 
 	if(clnode->isSleep()){
 		clnode->setClientSleepMessage(snMsg);
-		LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), "is sleeping. Message was saved.");
+		LOGWRITE(YELLOW_FORMAT1, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), "is sleeping. Message was saved.");
 		if(snMsg->getQos() == MQTTSN_FLAG_QOS_1){
 			snMsg->setQos(MQTTSN_FLAG_QOS_0);
 			snMsg->setMsgId(0);
@@ -1061,9 +1061,9 @@ void GatewayControlTask::handlePublish(Event* ev, ClientNode* clnode, MQTTMessag
 		}
 	}else if(clnode->isActive()){
 		if (snMsg->isDup()){
-			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH +", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+			LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBLISH +", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 		}else{
-			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
+			LOGWRITE(GREEN_FORMAT3, currentDateTime(), "PUBLISH", RIGHTARROW, clnode->getNodeId()->c_str(), msgPrint(snMsg));
 		}
 
 		clnode->setClientSendMessage(snMsg);

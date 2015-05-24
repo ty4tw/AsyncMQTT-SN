@@ -48,6 +48,7 @@
 #define GREEN_FORMAT     "%s   \x1b[0m\x1b[32m%-14s%-8s%-44s\x1b[0m\x1b[37m%s\n"
 #define GREEN_FORMAT1    "%s   \x1b[0m\x1b[32m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 #define GREEN_FORMAT2  "\n%s   \x1b[0m\x1b[32m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
+#define GREEN_FORMAT3    "%s   \x1b[0m\x1b[32m%-14s\x1b[0m\x1b[34m%-8s%-26s\x1b[0m\x1b[37m%s\n"
 
 #define YELLOW_FORMAT1   "%s   \x1b[0m\x1b[33m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 #define YELLOW_FORMAT2 "\n%s   \x1b[0m\x1b[33m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
@@ -55,6 +56,7 @@
 #define BLUE_FORMAT      "%s   \x1b[0m\x1b[34m%-14s%-8s%-44s\x1b[0m\x1b[37m%s\n"
 #define BLUE_FORMAT1     "%s   \x1b[0m\x1b[34m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 #define BLUE_FORMAT2   "\n%s   \x1b[0m\x1b[34m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
+#define BLUE_FORMAT3     "%s   \x1b[0m\x1b[34m%-14s\x1b[0m\x1b[32m%-8s%-26s\x1b[0m\x1b[37m%s\n"
 
 #define CYAN_FORMAT1     "%s   \x1b[0m\x1b[36m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 #define SYAN_FORMAT2   "\n%s   \x1b[0m\x1b[36m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"

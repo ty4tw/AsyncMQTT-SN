@@ -144,14 +144,14 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTPubAck* puback = new MQTTPubAck();
 			puback->deserialize(packet);
 			puback->serialize(sbuff);
-			LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBACK", LEFTARROW, BROKER, msgPrint(sbuff, puback));
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, puback));
 
 			clnode->setBrokerRecvMessage(puback);
 		}else if((*packet & 0xf0) == MQTT_TYPE_PUBREC){
 			MQTTPubRec* pubRec = new MQTTPubRec();
 			pubRec->deserialize(packet);
 			pubRec->serialize(sbuff);
-			LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBREC", LEFTARROW, BROKER, msgPrint(sbuff, pubRec));
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBREC", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, pubRec));
 
 			clnode->setBrokerRecvMessage(pubRec);
 
@@ -159,7 +159,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTPubRel* pubRel = new MQTTPubRel();
 			pubRel->deserialize(packet);
 			pubRel->serialize(sbuff);
-			LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBREL", LEFTARROW, BROKER, msgPrint(sbuff, pubRel));
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBREL", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, pubRel));
 
 			clnode->setBrokerRecvMessage(pubRel);
 
@@ -167,7 +167,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTPubComp* pubComp = new MQTTPubComp();
 			pubComp->deserialize(packet);
 			pubComp->serialize(sbuff);
-			LOGWRITE(BLUE_FORMAT1, currentDateTime(), "PUBCOMP", LEFTARROW, BROKER, msgPrint(sbuff, pubComp));
+			LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBCOMP", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, pubComp));
 
 			clnode->setBrokerRecvMessage(pubComp);
 
@@ -180,9 +180,9 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			}
 			publish->serialize(sbuff);
 			if (publish->isDup()){
-				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH +", LEFTARROW, BROKER, msgPrint(sbuff, publish));
+				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH +", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, publish));
 			} else {
-				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, BROKER, msgPrint(sbuff, publish));
+				LOGWRITE(GREEN_FORMAT2, currentDateTime(), "PUBLISH", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, publish));
 			}
 			clnode->setBrokerRecvMessage(publish);
 
@@ -190,7 +190,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTSubAck* suback = new MQTTSubAck();
 			suback->deserialize(packet);
 			suback->serialize(sbuff);
-			LOGWRITE(FORMAT1, currentDateTime(), "SUBACK", LEFTARROW, BROKER, msgPrint(sbuff, suback));
+			LOGWRITE(FORMAT1, currentDateTime(), "SUBACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, suback));
 
 			clnode->setBrokerRecvMessage(suback);
 
@@ -198,7 +198,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTPingResp* pingresp = new MQTTPingResp();
 			pingresp->deserialize(packet);
 			pingresp->serialize(sbuff);
-			LOGWRITE(FORMAT1, currentDateTime(), "PINGRESP", LEFTARROW, BROKER, msgPrint(sbuff, pingresp));
+			LOGWRITE(FORMAT1, currentDateTime(), "PINGRESP", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, pingresp));
 
 			clnode->setBrokerRecvMessage(pingresp);
 
@@ -206,7 +206,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTUnsubAck* unsuback = new MQTTUnsubAck();
 			unsuback->deserialize(packet);
 			unsuback->serialize(sbuff);
-			LOGWRITE(FORMAT1, currentDateTime(), "UNSUBACK", LEFTARROW, BROKER, msgPrint(sbuff, unsuback));
+			LOGWRITE(FORMAT1, currentDateTime(), "UNSUBACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, unsuback));
 
 			clnode->setBrokerRecvMessage(unsuback);
 
@@ -214,7 +214,7 @@ void BrokerRecvTask::recvAndFireEvent(ClientNode* clnode){
 			MQTTConnAck* connack = new MQTTConnAck();
 			connack->deserialize(packet);
 			connack->serialize(sbuff);
-			LOGWRITE(CYAN_FORMAT1, currentDateTime(), "CONNACK", LEFTARROW, BROKER, msgPrint(sbuff, connack));
+			LOGWRITE(CYAN_FORMAT1, currentDateTime(), "CONNACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(sbuff, connack));
 
 			clnode->setBrokerRecvMessage(connack);
 

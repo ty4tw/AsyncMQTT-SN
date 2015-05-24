@@ -87,22 +87,22 @@ void BrokerSendTask::run(){
 			MQTTPublish* msg = static_cast<MQTTPublish*>(srcMsg);
 			length = msg->serialize(_buffer);
 			if (msg->isDup()){
-				LOGWRITE(BLUE_FORMAT, currentDateTime(), "PUBLISH +", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+				LOGWRITE(BLUE_FORMAT3, currentDateTime(), "PUBLISH +", RIGHTARROW, BROKER, msgPrint(msg));
 			} else {
-				LOGWRITE(BLUE_FORMAT, currentDateTime(), "PUBLISH", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+				LOGWRITE(BLUE_FORMAT3, currentDateTime(), "PUBLISH", RIGHTARROW, BROKER, msgPrint(msg));
 			}
 			send(clnode, length);
 
 		}else if(srcMsg->getType() == MQTT_TYPE_PUBACK){
 			MQTTPubAck* msg = static_cast<MQTTPubAck*>(srcMsg);
 			length = msg->serialize(_buffer);
-			LOGWRITE(GREEN_FORMAT, currentDateTime(), "PUBACK", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+			LOGWRITE(BLUE_FORMAT3, currentDateTime(), "PUBACK", RIGHTARROW, BROKER, msgPrint(msg));
 			send(clnode, length);
 
 		}else if(srcMsg->getType() == MQTT_TYPE_PUBREL){
 			MQTTPubRel* msg = static_cast<MQTTPubRel*>(srcMsg);
 			length = msg->serialize(_buffer);
-			LOGWRITE(GREEN_FORMAT, currentDateTime(), "PUBREL", RIGHTARROW, GREEN_BROKER, msgPrint(msg));
+			LOGWRITE(BLUE_FORMAT3, currentDateTime(), "PUBREL", RIGHTARROW, BROKER, msgPrint(msg));
 			send(clnode, length);
 
 		}else if(srcMsg->getType() == MQTT_TYPE_PINGREQ){
