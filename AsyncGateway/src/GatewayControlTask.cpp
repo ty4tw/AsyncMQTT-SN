@@ -636,7 +636,6 @@ void GatewayControlTask::handleSnConnect(Event* ev, ClientNode* clnode, MQTTSnMe
 	}
 
 	if(sConnect->isWillRequired()){
-		clnode->getStack()->disconnect(); // close socket
 		MQTTSnWillTopicReq* reqTopic = new MQTTSnWillTopicReq();
 		Event* evwr = new Event();
 
