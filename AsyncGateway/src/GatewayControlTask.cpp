@@ -520,7 +520,7 @@ void GatewayControlTask::handleSnPingReq(Event* ev, ClientNode* clnode, MQTTSnMe
  -------------------------------------------------------*/
 void GatewayControlTask::handleSnPubAck(Event* ev, ClientNode* clnode, MQTTSnMessage* msg){
 
-	LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBACK", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
 
 	MQTTSnPubAck* sPubAck = new MQTTSnPubAck();
 	MQTTPubAck* pubAck = new MQTTPubAck();
@@ -540,7 +540,7 @@ void GatewayControlTask::handleSnPubAck(Event* ev, ClientNode* clnode, MQTTSnMes
  -------------------------------------------------------*/
 void GatewayControlTask::handleSnPubRec(Event* ev, ClientNode* clnode, MQTTSnMessage* msg){
 
-	LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBREC", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBREC", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
 
 	MQTTSnPubRec* sPubRec = new MQTTSnPubRec();
 	MQTTPubRec* pubRec = new MQTTPubRec();
@@ -560,7 +560,7 @@ void GatewayControlTask::handleSnPubRec(Event* ev, ClientNode* clnode, MQTTSnMes
  -------------------------------------------------------*/
 void GatewayControlTask::handleSnPubRel(Event* ev, ClientNode* clnode, MQTTSnMessage* msg){
 
-	LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBREL", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	LOGWRITE(BLUE_FORMAT2, currentDateTime(), "PUBREL", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
 
 	MQTTSnPubRel* sPubRel = new MQTTSnPubRel();
 	MQTTPubRel* pubRel = new MQTTPubRel();
