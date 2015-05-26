@@ -79,9 +79,6 @@ MqttsnClient* theClient = new MqttsnClient();
 
 #if !defined(ARDUINO) && !defined(MQTTSN_TEST)
 int main(int argc, char** argv){
-#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
-	debug.begin(9600);
-#endif
 	setup();
     loop();
 }

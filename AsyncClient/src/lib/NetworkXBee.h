@@ -64,7 +64,6 @@ using namespace std;
 	#define XB_SLEEP_PIN 4   // XBee Pinhybernate
 #endif
 
-namespace tomyAsyncClient {
 
 #define START_BYTE 0x7e
 #define ESCAPE     0x7d
@@ -83,13 +82,15 @@ namespace tomyAsyncClient {
 #define API_ID_POS                    3
 #define PACKET_OVERHEAD_LENGTH        6
 
-#define PACKET_TIMEOUT_CHECK         50   // 50ms
+#define PACKET_TIMEOUT_CHECK         100   // 100ms
 
 /*====  STATUS ====== */
 #define NO_ERROR               0
 #define CHECKSUM_ERROR         1
 #define PACKET_OVERFLOW        2
 #define UNEXPECTED_START_BYTE  3
+
+namespace tomyAsyncClient {
 
 /*===========================================
                 Serial Port

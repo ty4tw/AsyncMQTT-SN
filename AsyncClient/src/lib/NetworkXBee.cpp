@@ -356,6 +356,7 @@ void Network::readApiFrame(){
 
         if ( _byteData == START_BYTE){
             _pos = 1;
+            _checksumTotal = 0;
             D_NWA(F("\r\n===> Recv:    "));
             D_NWL("\r\n===> Recv:    ");
             continue;

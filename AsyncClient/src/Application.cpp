@@ -120,7 +120,7 @@ void task2(void){
 /*---------------  List of task invoked by Timer ------------*/
 
 TASK_LIST = {  //TASK( const char* topic, executing duration in second),
-             TASK(task1,2),
+             TASK(task1,10),
              TASK(task2,20),
              END_OF_TASK_LIST
             };
