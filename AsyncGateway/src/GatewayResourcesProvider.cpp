@@ -704,7 +704,12 @@ MQTTSnMessage* Event::getMqttSnMessage(){
         Class TopicIdMap
  =====================================*/
 TopicIdMap::TopicIdMap(){
-
+	char param[TOMYFRAME_PARAM_MAX];
+	if( theProcess->getParam("MaxInflightMsg", param) == 0){
+			_maxInflight = atoi(param);
+		}else{
+			_maxInflight = DEFAULT_INFRAIGHT_MSG;
+		}
 }
 
 TopicIdMap::~TopicIdMap(){
@@ -726,6 +731,14 @@ uint16_t TopicIdMap::getTopicId(uint16_t msgId){
 
 void TopicIdMap::add(uint16_t msgId, uint16_t topicId){
 	_mutex.lock();
+	if ( _map.size() >= _maxInflight){
+		TOPICID_MAP::iterator it = _map.end();
+		if (msgId > it->first){
+			_map.erase(_map.begin());
+		}else{
+			_map.erase(_map.lower_bound(msgId));
+		}
+	}
 	_map.insert(TOPICID_MAP::value_type(msgId, topicId));
 	_mutex.unlock();
 }

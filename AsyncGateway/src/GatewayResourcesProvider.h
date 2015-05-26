@@ -39,6 +39,7 @@
 #include <map>
 
 #define FILE_NAME_CLIENT_LIST "/usr/local/etc/tomygateway/config/clientList.conf"
+#define DEFAULT_INFRAIGHT_MSG  10
 using namespace tomyAsyncGateway;
 /*=====================================
         Class MessageQue
@@ -72,6 +73,7 @@ public:
 private:
 	TOPICID_MAP _map;
 	Mutex       _mutex;
+	uint8_t     _maxInflight;
 };
 
 

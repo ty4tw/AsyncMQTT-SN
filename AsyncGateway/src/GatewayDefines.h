@@ -28,9 +28,27 @@
 #ifndef GATEWAYDEFINES_H_
 #define GATEWAYDEFINES_H_
 
-#define GATEWAY_VERSION "(Ver 1.2.2)"
+#define GATEWAY_VERSION "(Ver 1.2.3)"
 #define GATEWAY_TYPE "AsyncTomyGateway"
 
+/*===========================================
+ *   Gateway Control Constants
+ ===========================================*/
+
+#define BROKER_HOST_NAME  "localhost"
+#define BROKER_PORT       "1883"
+
+#define KEEP_ALIVE_TIME   900    // 900 sec = 15 min
+
+#define TIMEOUT_PERIOD     10    //  10 sec = 10 sec
+
+#define SEND_UNIXTIME_TIME 30    // 30sec after KEEP_ALIVE_TIME
+
+#define MAX_CLIENT_NODES  500
+
+/*==========================================================
+ *           Log Formats
+ ===========================================================*/
 #define BROKER      "Broker"
 #define GREEN_BROKER "\x1b[0m\x1b[32mBroker\x1b[0m\x1b[37m"
 #define GATEWAY     "Gateway"
@@ -61,23 +79,6 @@
 #define CYAN_FORMAT1     "%s   \x1b[0m\x1b[36m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 #define SYAN_FORMAT2   "\n%s   \x1b[0m\x1b[36m%-14s%-8s%-26s\x1b[0m\x1b[37m%s\n"
 
-/*===========================================
- *   Gateway Control Constants
- ===========================================*/
-
-#define BROKER_HOST_NAME  "localhost"
-#define BROKER_PORT       "1883"
-
-
-#define KEEP_ALIVE_TIME   900    // 900 sec = 15 min
-
-#define TIMEOUT_PERIOD     10    //  10 sec = 10 sec
-
-#define SEND_UNIXTIME_TIME 30    // 30sec after KEEP_ALIVE_TIME
-
-
-
-#define MAX_CLIENT_NODES  500
 
 /*==========================================================
  *           Light Indicators
