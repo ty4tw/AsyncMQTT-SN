@@ -203,8 +203,20 @@ void ClientRecvTask::run(){
 					clnode->setClientRecvMessage(msg);
 					ev->setClientRecvEvent(clnode);
 
+				}else if(*(recvMsg + offset) == MQTTSN_TYPE_PUBREC){
+					MQTTSnPubRec* msg = new MQTTSnPubRec();
+					msg->absorb(recvMsg);
+					clnode->setClientRecvMessage(msg);
+					ev->setClientRecvEvent(clnode);
+
 				}else if(*(recvMsg + offset) == MQTTSN_TYPE_PUBREL){
 					MQTTSnPubRel* msg = new MQTTSnPubRel();
+					msg->absorb(recvMsg);
+					clnode->setClientRecvMessage(msg);
+					ev->setClientRecvEvent(clnode);
+
+				}else if(*(recvMsg + offset) == MQTTSN_TYPE_PUBCOMP){
+					MQTTSnPubComp* msg = new MQTTSnPubComp();
 					msg->absorb(recvMsg);
 					clnode->setClientRecvMessage(msg);
 					ev->setClientRecvEvent(clnode);

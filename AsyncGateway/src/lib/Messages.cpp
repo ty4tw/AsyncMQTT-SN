@@ -1394,6 +1394,7 @@ uint16_t MQTTPubRec::getMessageId(){
   ======================================*/
 MQTTPubRel::MQTTPubRel(){
 	_type = MQTT_TYPE_PUBREL;
+	_flags = 0x02;
 	_remainLength = 2;
 }
 

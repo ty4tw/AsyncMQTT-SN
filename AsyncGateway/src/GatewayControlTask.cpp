@@ -580,7 +580,7 @@ void GatewayControlTask::handleSnPubRel(Event* ev, ClientNode* clnode, MQTTSnMes
  -------------------------------------------------------*/
 void GatewayControlTask::handleSnPubComp(Event* ev, ClientNode* clnode, MQTTSnMessage* msg){
 
-	LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBREL", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
+	LOGWRITE(GREEN_FORMAT1, currentDateTime(), "PUBCOMP", LEFTARROW, clnode->getNodeId()->c_str(), msgPrint(msg));
 
 	MQTTSnPubComp* sPubComp= new MQTTSnPubComp();
 	MQTTPubComp* pubComp = new MQTTPubComp();
