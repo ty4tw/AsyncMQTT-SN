@@ -79,6 +79,9 @@ MqttsnClient* theClient = new MqttsnClient();
 
 #if !defined(ARDUINO) && !defined(MQTTSN_TEST)
 int main(int argc, char** argv){
+#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
+	debug.begin(9600);
+#endif
 	setup();
     loop();
 }
@@ -228,7 +231,7 @@ int MqttsnClient::sleep(void){
 
 #define SLEEP_TIME SLEEP_1S
 	uint32_t sec = 1;
-
+/*
 	// ATmega328P, ATmega168
 	LowPower.idle(SLEEP_TIME, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
 				SPI_OFF, USART0_OFF, TWI_OFF);
@@ -244,6 +247,7 @@ int MqttsnClient::sleep(void){
 	//		  TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART3_OFF,
 	//		  USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
 	//Timer::setUnixTime(Timer::getUnixTime() + sec);
+*/
 	return 0;
 }
 

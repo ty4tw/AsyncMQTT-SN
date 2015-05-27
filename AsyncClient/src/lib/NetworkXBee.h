@@ -61,6 +61,7 @@ using namespace std;
     #endif
 
 	#define XB_CTS_PIN   3   // XBee CTS
+	#define XB_RTS_PIN   3   // XBee RTS
 	#define XB_SLEEP_PIN 4   // XBee Pinhybernate
 #endif
 
@@ -82,7 +83,7 @@ using namespace std;
 #define API_ID_POS                    3
 #define PACKET_OVERHEAD_LENGTH        6
 
-#define PACKET_TIMEOUT_CHECK         100   // 100ms
+#define PACKET_TIMEOUT_CHECK         50   // 50ms
 
 /*====  STATUS ====== */
 #define NO_ERROR               0
@@ -104,8 +105,10 @@ public:
     int  open(NETWORK_CONFIG config);
     bool send(unsigned char b);
     bool recv(unsigned char* b);
-    bool checkRecvBuf();
-    void flush();
+    bool checkRecvBuf(void);
+    void flush(void);
+	void rtsOn(void);
+	void rtsOff(void);
 private:
     Stream* _serialDev;
 };
@@ -125,6 +128,8 @@ public:
     bool recv(unsigned char* b);
     bool checkRecvBuf();
     void flush();
+	void rtsOn(void);
+	void rtsOff(void);
 private:
     int _fd;  // file descriptor
     struct termios _tio;

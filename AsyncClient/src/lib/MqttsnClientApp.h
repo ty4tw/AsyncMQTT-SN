@@ -40,7 +40,7 @@
 *****************************************/
 
 /*-------- Select Network  -------------*/
-#define NETWORK_UDP
+//#define NETWORK_UDP
 
 
 #if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
@@ -54,7 +54,7 @@
 
 /*--- XBee Buffer Flow Control --*/
 #ifdef NETWORK_XBEE
-	//#define XBEE_FLOWCTL_CRTSCTS
+	#define XBEE_FLOWCTL_CRTSCTS
 #endif
 
 /*======================================
@@ -66,11 +66,13 @@
  *         Debug Flag
  ======================================*/
 //#define DEBUG_NW
-//#define DEBUG_MQTTSN
+#define DEBUG_MQTTSN
 
 /****************************************
       MQTT-SN Parameters
 *****************************************/
+#define MAX_INFLIGHT_MSG   10
+
 #if defined(NETWORK_XBEE) || defined(ARDUINO)
     #define MQTTSN_MAX_MSG_LENGTH    70
     #define MQTTSN_MAX_PACKET_SIZE  128
@@ -83,7 +85,6 @@
 #define MQTTSN_DEFAULT_DURATION    900     // 15min
 #define MQTTSN_TIME_SEARCHGW         3
 #define MQTTSN_TIME_RETRY           10
-#define MQTTSN_TIME_WAIT           300     //  5min
 #define MQTTSN_RETRY_COUNT           5
 
 /****************************************

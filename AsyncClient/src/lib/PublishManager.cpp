@@ -61,6 +61,7 @@ const char* NULLCHAR = "";
 
 PublishManager::PublishManager(){
     _first = 0;
+    _elmCnt = 0;
 }
 
 PublishManager::~PublishManager(){
@@ -90,6 +91,10 @@ void  PublishManager::publish(uint16_t topicId, Payload* payload, uint8_t qos){
 }
 
 void PublishManager::sendPublish(PubElement* elm){
+	if (elm == 0){
+		return;
+	}
+
     theClient->getGwProxy()->connect();
     
     uint8_t msg[MQTTSN_MAX_MSG_LENGTH + 1];
@@ -102,11 +107,11 @@ void PublishManager::sendPublish(PubElement* elm){
         msg[0] = (uint8_t)elm->payload->getLen() + 7;
     }
     msg[org + 1] = MQTTSN_TYPE_PUBLISH;
-    msg[org + 2] = elm->qos | elm->retain | elm->topicType;
+    msg[org + 2] = elm->_flag;
     if ((elm->retryCount < MQTTSN_RETRY_COUNT)){
         msg[org + 2] = msg[org + 2] | MQTTSN_FLAG_DUP;
     }
-    if (elm->topicType == MQTTSN_TOPIC_TYPE_SHORT){
+    if ((elm->_flag & 0x03) == MQTTSN_TOPIC_TYPE_SHORT){
         memcpy( msg + org + 3, elm->topicName, 2);
     }else{
         setUint16(msg + org + 3, elm->topicId);
@@ -116,12 +121,12 @@ void PublishManager::sendPublish(PubElement* elm){
 
 	theClient->getGwProxy()->writeMsg(msg);
 	theClient->getGwProxy()->resetPingReqTimer();
-    if ( elm->qos == MQTTSN_FLAG_QOS_0){
+    if (( elm->_flag & 0x60) == MQTTSN_FLAG_QOS_0){
         remove(elm);  // PUBLISH Done
         return;
-    }else if (elm->qos == MQTTSN_FLAG_QOS_1){
+    }else if ((elm->_flag & 0x60) == MQTTSN_FLAG_QOS_1){
         elm->status = WAIT_PUBACK;
-    }else if (elm->qos == MQTTSN_FLAG_QOS_2){
+    }else if ((elm->_flag & 0x60) == MQTTSN_FLAG_QOS_2){
         elm->status = WAIT_PUBREC;
     }
     
@@ -135,7 +140,7 @@ void PublishManager::sendSuspend(const char* topicName, uint16_t topicId, uint8_
 	while (elm){
 		if (strcmp(elm->topicName, topicName) == 0 && elm->status == TOPICID_IS_SUSPEND){
 			elm->topicId = topicId;
-			elm->topicType = topicType;
+			elm->_flag |= topicType;
 			elm->status = TOPICID_IS_READY;
 			sendPublish(elm);
 			elm = 0;
@@ -157,15 +162,19 @@ void PublishManager::sendPubAck(uint16_t topicId, uint16_t msgId, uint8_t rc){
 
 void PublishManager::sendPubRel(PubElement* elm){
 	uint8_t msg[4];
-	msg[0] = 7;
-	msg[1] = MQTTSN_TYPE_PUBCOMP;
+	msg[0] = 4;
+	msg[1] = MQTTSN_TYPE_PUBREL;
 	setUint16(msg + 2, elm->msgId);
 	theClient->getGwProxy()->writeMsg(msg);
 }
 
 
 bool PublishManager::isDone(void){
-	return _first == 0;
+	return (_first == 0);
+}
+
+bool PublishManager::isMaxFlight(void){
+	return (_elmCnt > MAX_INFLIGHT_MSG / 2);
 }
 
 void PublishManager::responce(const uint8_t* msg, uint16_t msglen){
@@ -191,7 +200,7 @@ void PublishManager::responce(const uint8_t* msg, uint16_t msglen){
         if (elm == 0){
         	return;
         }
-        if (elm->status == WAIT_PUBREC){
+        if (elm->status == WAIT_PUBREC || elm->status == WAIT_PUBCOMP){
             sendPubRel(elm);
             elm->status = WAIT_PUBCOMP;
             elm->sendUTC = Timer::getUnixTime();
@@ -219,30 +228,16 @@ void PublishManager::published(uint8_t* msg, uint16_t msglen){
 
 void PublishManager::checkTimeout(void){
     PubElement* elm = _first;
-	PubElement* sav;
 	while (elm){
 		if ( elm->sendUTC > 0 && elm->sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
-			if (elm->retryCount > 0){
+			if (elm->retryCount >= 0){
 				sendPublish(elm);
 				D_MQTTL("...Timeout retry\r\n");
 				D_MQTTA(F("...Timeout retry\r\n"));
 			}else{
-				D_MQTTA(F("...Timeout delete\r\n"));
-				D_MQTTL("...Timeout delete\r\n");
-				if (elm->next){
-					sav = elm->prev;
-					remove(elm);
-					theClient->getGwProxy()->reconnect();
-					if(sav){
-						elm = sav;
-					}else{
-						break;
-					}
-				}else{
-					remove(elm);
-					theClient->getGwProxy()->reconnect();
-					break;
-				}
+				theClient->getGwProxy()->reconnect();
+				elm->retryCount = MQTTSN_RETRY_COUNT;
+				break;
 			}
 		}
 		elm = elm->next;
@@ -287,6 +282,7 @@ void PublishManager::remove(PubElement* elm){
     		elm->prev->next = elm->next;
     		free(elm);
     	}
+        _elmCnt--;
     }
 }
 
@@ -307,28 +303,29 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 
 	if (strlen(topicName) == 2){
         topicId = 0;
-        elm->topicType = MQTTSN_TOPIC_TYPE_SHORT;
+        elm->_flag |= MQTTSN_TOPIC_TYPE_SHORT;
     }else if (strlen(topicName) > 2){
         topicId = theClient->getTopicTable()->getTopicId((char*)topicName);
-        elm->topicType = MQTTSN_TOPIC_TYPE_NORMAL;
+        elm->_flag |= MQTTSN_TOPIC_TYPE_NORMAL;
     }else{
-		elm->topicType = MQTTSN_TOPIC_TYPE_PREDEFINED;
+		elm->_flag |= MQTTSN_TOPIC_TYPE_PREDEFINED;
 	}
+    if (qos == 0){
+        elm->_flag |= MQTTSN_FLAG_QOS_0;
+    }else if ( qos == 1){
+        elm->_flag |= MQTTSN_FLAG_QOS_1;
+    }else if (qos == 2){
+        elm->_flag |= MQTTSN_FLAG_QOS_2;
+    }
+    if (retain){
+        elm->_flag |= MQTTSN_FLAG_RETAIN;
+    }
+
     if (topicId){
         elm->status = TOPICID_IS_READY;
         elm->topicId = topicId;
     }
     elm->payload = payload;
-    if (qos == 0){
-        elm->qos = MQTTSN_FLAG_QOS_0;
-    }else if ( qos == 1){
-        elm->qos = MQTTSN_FLAG_QOS_1;
-    }else if (qos == 2){
-        elm->qos = MQTTSN_FLAG_QOS_2;
-    }
-    if (retain){
-        elm->retain = MQTTSN_FLAG_RETAIN;
-    }
 	elm->msgId = msgId;
 	elm->retryCount = MQTTSN_RETRY_COUNT;
 	elm->sendUTC = 0;
@@ -344,5 +341,6 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 			last = 0;
 		}
 	}
+	++_elmCnt;
 	return elm;
 }

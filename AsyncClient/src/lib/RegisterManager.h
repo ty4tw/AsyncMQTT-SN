@@ -48,7 +48,7 @@ namespace tomyAsyncClient {
 typedef struct RegQueElement{
 	const char* topicName;
 	uint16_t msgId;
-    uint8_t  retryCount;
+    int      retryCount;
     uint32_t sendUTC;
 	RegQueElement* prev;
 	RegQueElement* next;

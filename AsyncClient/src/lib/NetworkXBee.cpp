@@ -150,6 +150,17 @@ void SerialPort::flush(void){
     _serialDev->flush();
 }
 
+void SerialPort::rtsOff(void){
+    pinMode(XB_RTS_PIN, INPUT);
+}
+
+void SerialPort::rtsOn(void){
+    pinMode(XB_RTS_PIN, OUTPUT);
+    digitalWrite(XB_RTS_PIN, LOW);
+    delay(20);
+}
+
+
 #endif /* ARDUINO */
 
 
@@ -240,6 +251,14 @@ void SerialPort::flush(void){
   tcsetattr(_fd, TCSAFLUSH, &_tio);
 }
 
+void SerialPort::rtsOn(void){
+
+}
+
+void SerialPort::rtsOff(void){
+
+}
+
 #endif
 
 
@@ -263,6 +282,7 @@ Network::~Network(){
 }
 
 int Network::initialize(XBeeConfig config){
+	_serialPort->rtsOff();
 	return _serialPort->open(config);
 }
 
@@ -288,6 +308,7 @@ void Network::setSerialPort(SerialPort *serialPort){
 
 uint8_t* Network::getResponce(int* len){
 	memset(_responseData, 0, MQTTSN_MAX_PACKET_SIZE + 1);
+	_serialPort->rtsOn();
 	if(_serialPort->checkRecvBuf()){
 		if(readApiFrame(PACKET_TIMEOUT_CHECK)){
 			if(_responseData[API_ID_POS] == XB_API_RESPONSE){
@@ -297,6 +318,7 @@ uint8_t* Network::getResponce(int* len){
 			}
 		}
 	}
+	_serialPort->rtsOff();
 	return 0;
 }
 

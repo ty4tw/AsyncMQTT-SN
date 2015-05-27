@@ -73,18 +73,26 @@ void TaskManager::add(TaskList* task){
 }
 
 void TaskManager::run(void){
-    for (uint8_t i = 0; _task[i].callback > 0; i++){
-		if ((_task[i].prevTime + _task[i].interval < Timer::getUnixTime())){
-    		_task[i].prevTime = Timer::getUnixTime();
-			(_task[i].callback)();
+	while (true){
+		theClient->getGwProxy()->getResponce();
+
+		for (uint8_t i = 0; _task[i].callback > 0; i++){
+			if ((_task[i].prevTime + _task[i].interval < Timer::getUnixTime())){
+				_task[i].prevTime = Timer::getUnixTime();
+				(_task[i].callback)();
+			}
+		}
+
+		while (theClient->getPublishManager()->isMaxFlight() ||
+			   !theClient->getSubscribeManager()->isDone() ||
+			   !theClient->getRegisterManager()->isDone())
+		{
+			theClient->getGwProxy()->getResponce();
+			theClient->getGwProxy()->getResponce();
+		}
+		if (theClient->getPublishManager()->isDone()){
+			break;
 		}
 	}
-
-    while (!theClient->getPublishManager()->isDone()   ||
-    	   !theClient->getSubscribeManager()->isDone() ||
-    	   !theClient->getRegisterManager()->isDone())
-    {
-        theClient->getGwProxy()->getResponce();
-    }
 }
 

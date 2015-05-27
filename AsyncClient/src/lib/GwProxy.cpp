@@ -71,7 +71,7 @@ GwProxy::GwProxy(){
 	_willMsg = 0;
 	_qosWill = 0;
 	_retainWill = 0;
-	_tPing = MQTTSN_DEFAULT_KEEPALIVE;
+	_tkeepAlive = MQTTSN_DEFAULT_KEEPALIVE;
 	_tAdv = MQTTSN_DEFAULT_DURATION;
 	_cleanSession = 0;
 	_pingStatus = 0;
@@ -89,7 +89,7 @@ void GwProxy::initialize(APP_CONFIG config){
     _qosWill = config.mqttsnCfg.willQos;
     _retainWill = config.mqttsnCfg.willRetain;
     _cleanSession = config.mqttsnCfg.cleanSession;
-    _tPing = config.mqttsnCfg.keepAlive * 1000;
+    _tkeepAlive = config.mqttsnCfg.keepAlive;
 }
 
 void GwProxy::connect(){
@@ -120,7 +120,7 @@ void GwProxy::connect(){
 				_msg[2] = MQTTSN_FLAG_CLEAN;
 			}
 			*pos++ = MQTTSN_PROTOCOL_ID;
-			setUint16((uint8_t*)pos, _tPing);
+			setUint16((uint8_t*)pos, _tkeepAlive);
 			pos += 2;
 			strncpy(pos, _clientId, clientIdLen);
 			_msg[ 6 + clientIdLen] = 0;
@@ -180,7 +180,7 @@ int GwProxy::getConnectResponce(void){
 	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_CONNACK && _status == GW_WAIT_CONNACK){
 		if (_mqttsnMsg[1] == 0x00){
 			_status = GW_CONNECTED;
-			_keepAliveTimer.start(_tPing);
+			_keepAliveTimer.start(_tkeepAlive * 1000);
 			_topicTbl.clearTopic();
 			theClient->onConnect();  // SUBSCRIBEs are conducted
 		}else{
@@ -193,6 +193,7 @@ int GwProxy::getConnectResponce(void){
 void GwProxy::reconnect(void){
 	D_MQTTL("...Gateway reconnect\r\n");
 	_status = GW_DISCONNECTED;
+	connect();
 }
 
 void GwProxy::disconnect(uint16_t secs){
@@ -226,7 +227,7 @@ int GwProxy::getDisconnectResponce(void){
 
 	if (len == 0){
 		if (_sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
-			if (--_retryCount > 0){
+			if (--_retryCount >= 0){
 				writeMsg((const uint8_t*)_msg);
 				_sendUTC = Timer::getUnixTime();
 			}else{
@@ -279,12 +280,12 @@ int GwProxy::getResponce(void){
 		// Check Timeout of SUBSCRIBEs,
         theClient->getSubscribeManager()->checkTimeout();
 
-	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_PUBACK || _mqttsnMsg[0] == MQTTSN_TYPE_PUBCOMP ||
+	}else if (_mqttsnMsg[0] == MQTTSN_TYPE_PUBLISH){
+        theClient->getPublishManager()->published(_mqttsnMsg, len);
+
+    }else if (_mqttsnMsg[0] == MQTTSN_TYPE_PUBACK || _mqttsnMsg[0] == MQTTSN_TYPE_PUBCOMP ||
 			_mqttsnMsg[0] == MQTTSN_TYPE_PUBREC || _mqttsnMsg[0] == MQTTSN_TYPE_PUBREL ){
         theClient->getPublishManager()->responce(_mqttsnMsg, (uint16_t)len);
-
-    }else if (_mqttsnMsg[0] == MQTTSN_TYPE_PUBLISH){
-        theClient->getPublishManager()->published(_mqttsnMsg, len);
 
     }else if (_mqttsnMsg[0] == MQTTSN_TYPE_SUBACK || _mqttsnMsg[0] == MQTTSN_TYPE_UNSUBACK){
         theClient->getSubscribeManager()->responce(_mqttsnMsg);
@@ -469,5 +470,5 @@ RegisterManager* GwProxy::getRegisterManager(void){
 }
 
 void GwProxy::resetPingReqTimer(void){
-	_keepAliveTimer.start(_tPing);
+	_keepAliveTimer.start(_tkeepAlive * 1000);
 }

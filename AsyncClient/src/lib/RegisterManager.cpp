@@ -216,7 +216,7 @@ uint8_t  RegisterManager::checkTimeout(void){
 	RegQueElement* sav;
 	while (elm){
 		if ( elm->sendUTC + MQTTSN_TIME_RETRY < Timer::getUnixTime()){
-			if (elm->retryCount > 0){
+			if (elm->retryCount >= 0){
 				send(elm);
 			}else{
 				if (elm->next){

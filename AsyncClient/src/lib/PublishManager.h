@@ -73,19 +73,17 @@ namespace tomyAsyncClient {
 
 
 typedef struct PubElement{
-    int (*callback)(void);
-    const char* topicName;
-    uint16_t  topicId;
-    Payload*  payload;
-    uint8_t   topicType;
-    uint8_t   qos;
-    uint8_t   retain;
-    uint8_t   retryCount;
-    uint8_t   status;  // 0:SUSPEND, 1:READY
     uint16_t  msgId;
+    uint16_t  topicId;
+    const char* topicName;
+    Payload*  payload;
     uint32_t  sendUTC;
+    int       (*callback)(void);
+    int       retryCount;
     PubElement* prev;
     PubElement* next;
+    uint8_t   _flag;
+    uint8_t   status;  // 0:SUSPEND, 1:READY
 } PubElement;
 
 /*========================================
@@ -102,6 +100,7 @@ public:
     void checkTimeout(void);
     void sendSuspend(const char* topicName, uint16_t topicId, uint8_t topicType);
     bool isDone(void);
+    bool isMaxFlight(void);
 private:
     PubElement* getElement(uint16_t msgId);
     PubElement* getElement(const char* topicName);
@@ -113,6 +112,7 @@ private:
     void sendPubRel(PubElement* elm);
     //void sendPubComp(PubElement* elm);
 	PubElement* _first;
+	uint8_t     _elmCnt;
 };
  
 } /* tomyAsyncClient */

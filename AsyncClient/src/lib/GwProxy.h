@@ -136,10 +136,10 @@ private:
 	uint8_t     _retainWill;
 	uint8_t     _qosWill;
 	uint8_t     _gwId;
-	uint32_t    _tPing;
+	uint16_t    _tkeepAlive;
 	uint32_t    _tAdv;
 	uint32_t    _sendUTC;
-	uint8_t     _retryCount;
+	int         _retryCount;
 	uint8_t     _status;
 	uint32_t    _pingSendUTC;
 	uint8_t     _pingRetryCount;

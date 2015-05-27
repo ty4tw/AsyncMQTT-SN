@@ -60,7 +60,7 @@ extern MqttsnClient* theClient;
  XBEE_APP_CONFIG = {
     {
     	"client01",     //ClientId
-        57600,          //Baudrate
+        38400,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         "/dev/ttyUSB0"               //Device (for linux App)
     },
@@ -110,7 +110,7 @@ void task1(void){
   Payload* pl = new Payload(10);
   onoffFlg = !onoffFlg;
   pl->set_bool(onoffFlg);
-  PUBLISH(topic1,pl,1);
+  PUBLISH(topic2,pl,2);
 }
 
 void task2(void){
@@ -120,7 +120,7 @@ void task2(void){
 /*---------------  List of task invoked by Timer ------------*/
 
 TASK_LIST = {  //TASK( const char* topic, executing duration in second),
-             TASK(task1,10),
+             TASK(task1,15),
              TASK(task2,20),
              END_OF_TASK_LIST
             };
@@ -137,7 +137,7 @@ int on_publish(Payload* payload){
 
 /*------------ Link Callback to Topic -------------*/
 
-SUBSCRIBE_LIST = {  //SUB(topic, on_publish, QoS),
+SUBSCRIBE_LIST = {//SUB(topic, callback, QoS=0or1),
                   SUB(topic2, on_publish, 1),
                   END_OF_SUBSCRIBE_LIST
                  };

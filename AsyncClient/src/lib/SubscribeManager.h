@@ -64,17 +64,17 @@ using namespace std;
 namespace tomyAsyncClient {
 
 typedef struct SubElement{
-    uint8_t   msgType;
     TopicCallback callback;
     const char* topicName;
-    uint16_t  topicId;
-    uint8_t   topicType;
-    uint8_t   qos;
-    uint8_t   retryCount;
     uint16_t  msgId;
     uint32_t  sendUTC;
     SubElement* prev;
     SubElement* next;
+    uint16_t  topicId;
+    int       retryCount;
+    uint8_t   msgType;
+    uint8_t   topicType;
+    uint8_t   qos;
 } SubElement;
 
 /*========================================
