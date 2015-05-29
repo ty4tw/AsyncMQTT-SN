@@ -148,6 +148,10 @@ RegisterManager*  MqttsnClient::getRegisterManager(void){
 	return _gwProxy.getRegisterManager();
 }
 
+TaskManager* MqttsnClient::getTaskManager(void){
+    return &_taskMgr;
+};
+
 TopicTable* MqttsnClient::getTopicTable(void){
     return _gwProxy.getTopicTable();
 }

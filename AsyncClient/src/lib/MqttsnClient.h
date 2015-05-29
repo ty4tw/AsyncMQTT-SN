@@ -97,8 +97,9 @@ public:
     PublishManager*   getPublishManager(void);
     SubscribeManager* getSubscribeManager(void);
     RegisterManager*  getRegisterManager(void);
+    TaskManager*      getTaskManager(void);
     TopicTable*       getTopicTable(void);
-    void indicator(bool onoff);
+    void              indicator(bool onoff);
 private:
     TaskManager      _taskMgr;
     PublishManager   _pubMgr;

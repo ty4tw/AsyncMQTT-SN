@@ -223,7 +223,9 @@ void PublishManager::published(uint8_t* msg, uint16_t msglen){
     }
     Payload pl;
     pl.getPayload(msg + 6, msglen - 6);
+    _publishedFlg = 1;
     theClient->getTopicTable()->execCallback(getUint16(msg + 2), &pl, msg[1] & 0x03);
+    _publishedFlg = 0;
 }
 
 void PublishManager::checkTimeout(void){
@@ -277,9 +279,11 @@ void PublishManager::remove(PubElement* elm){
     			elm->next->prev = 0;
     		}
             delete elm->payload;
+    		theClient->getTaskManager()->done(elm->taskIndex);
     		free(elm);
     	}else{
     		elm->prev->next = elm->next;
+    		theClient->getTaskManager()->done(elm->taskIndex);
     		free(elm);
     	}
         _elmCnt--;
@@ -329,6 +333,13 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 	elm->msgId = msgId;
 	elm->retryCount = MQTTSN_RETRY_COUNT;
 	elm->sendUTC = 0;
+
+	if (_publishedFlg == 0){
+		elm->taskIndex = theClient->getTaskManager()->getIndex();
+		theClient->getTaskManager()->suspend(elm->taskIndex);
+	}else{
+		elm->taskIndex = 0;
+	}
 
 	while(last){
 		prev = last;

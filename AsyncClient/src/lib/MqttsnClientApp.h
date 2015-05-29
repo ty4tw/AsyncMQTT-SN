@@ -27,9 +27,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
+ *      Author: Tomoaki, YAMAGUCHI
  */
 
 #ifndef MQTTSNCLIENTAPP_H_
@@ -40,7 +38,7 @@
 *****************************************/
 
 /*-------- Select Network  -------------*/
-//#define NETWORK_UDP
+#define NETWORK_UDP
 
 
 #if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
@@ -66,7 +64,7 @@
  *         Debug Flag
  ======================================*/
 //#define DEBUG_NW
-#define DEBUG_MQTTSN
+//#define DEBUG_MQTTSN
 
 /****************************************
       MQTT-SN Parameters
@@ -169,8 +167,8 @@ struct UdpAppConfig{
 #define DISCONNECT(...)  theClient->disconnect(__VA_ARGS__)
 
 #define TASK_LIST         TaskList theTaskList[]
-#define TASK(...)         {__VA_ARGS__, 0}
-#define END_OF_TASK_LIST  {0,0}
+#define TASK(...)         {__VA_ARGS__, 0, 0}
+#define END_OF_TASK_LIST  {0,0, 0, 0}
 #define SUBSCRIBE_LIST    OnPublishList theOnPublishList[]
 #define SUB(...)          {__VA_ARGS__}
 #define END_OF_SUBSCRIBE_LIST {0,0,0}

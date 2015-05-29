@@ -84,6 +84,7 @@ typedef struct PubElement{
     PubElement* next;
     uint8_t   _flag;
     uint8_t   status;  // 0:SUSPEND, 1:READY
+    uint8_t   taskIndex;
 } PubElement;
 
 /*========================================
@@ -113,6 +114,7 @@ private:
     //void sendPubComp(PubElement* elm);
 	PubElement* _first;
 	uint8_t     _elmCnt;
+	uint8_t     _publishedFlg;
 };
  
 } /* tomyAsyncClient */

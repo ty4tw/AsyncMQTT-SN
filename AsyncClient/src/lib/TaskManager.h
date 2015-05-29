@@ -27,9 +27,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
+ *      Author: Tomoaki, YAMAGUCHI
  */
 
 #ifndef TASKMANAGER_H_
@@ -64,13 +62,13 @@ namespace tomyAsyncClient {
 struct TaskList{
     void     (*callback)(void);
 	uint32_t interval;
-    uint32_t prevTime;;
+    uint32_t prevTime;
+    uint8_t  status;
 };
 
 
 #define TASK_DONE    0
-#define TASK_RUN     1
-#define TASK_SUSPEND 2
+#define TASK_SUSPEND 1
 
 /*========================================
        Class TaskManager
@@ -81,8 +79,12 @@ public:
     ~TaskManager();
     void add(TaskList* task);
     void run(void);
+    void done(uint8_t index);
+    void suspend(uint8_t index);
+    uint8_t getIndex(void);
 private:
     TaskList* _task;
+    uint8_t   _index;
 
 };
 

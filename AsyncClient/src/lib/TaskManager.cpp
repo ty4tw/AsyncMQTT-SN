@@ -27,9 +27,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
+ *      Author: Tomoaki, YAMAGUCHI
  */
 
 #ifdef ARDUINO
@@ -76,23 +74,35 @@ void TaskManager::run(void){
 	while (true){
 		theClient->getGwProxy()->getResponce();
 
-		for (uint8_t i = 0; _task[i].callback > 0; i++){
-			if ((_task[i].prevTime + _task[i].interval < Timer::getUnixTime())){
-				_task[i].prevTime = Timer::getUnixTime();
-				(_task[i].callback)();
+		for (uint8_t _index = 0; _task[_index].callback > 0; _index++){
+			if ((_task[_index].prevTime + _task[_index].interval < Timer::getUnixTime()) &&
+				 _task[_index].status == TASK_DONE){
+				_task[_index].prevTime = Timer::getUnixTime();
+				(_task[_index].callback)();
 			}
 		}
 
-		while (theClient->getPublishManager()->isMaxFlight() ||
+		do{
+			theClient->getGwProxy()->getResponce();
+			theClient->getGwProxy()->getResponce();
+		}while(theClient->getPublishManager()->isMaxFlight() ||
 			   !theClient->getSubscribeManager()->isDone() ||
-			   !theClient->getRegisterManager()->isDone())
-		{
-			theClient->getGwProxy()->getResponce();
-			theClient->getGwProxy()->getResponce();
-		}
+			   !theClient->getRegisterManager()->isDone());
+
 		if (theClient->getPublishManager()->isDone()){
 			break;
 		}
 	}
 }
 
+uint8_t TaskManager::getIndex(void){
+	return _index;
+}
+
+void TaskManager::done(uint8_t index){
+	_task[_index].status = TASK_DONE;
+}
+
+void TaskManager::suspend(uint8_t index){
+	_task[_index].status = TASK_SUSPEND;
+}
