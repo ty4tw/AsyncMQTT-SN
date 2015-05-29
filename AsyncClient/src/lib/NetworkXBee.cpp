@@ -167,6 +167,7 @@ void SerialPort::rtsOn(void){
 #ifdef LINUX
 
 SerialPort::SerialPort(){
+	memset(&_tio, 0, sizeof(termios));
     _tio.c_iflag = IGNBRK | IGNPAR;
 #ifdef XBEE_FLOWCTRL_CRTSCTS
     _tio.c_cflag = CS8 | CLOCAL | CREAD | CRTSCTS;

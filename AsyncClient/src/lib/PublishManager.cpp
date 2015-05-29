@@ -62,6 +62,7 @@ const char* NULLCHAR = "";
 PublishManager::PublishManager(){
     _first = 0;
     _elmCnt = 0;
+    _publishedFlg = SAVE_TASK_INDEX;
 }
 
 PublishManager::~PublishManager(){
@@ -223,9 +224,9 @@ void PublishManager::published(uint8_t* msg, uint16_t msglen){
     }
     Payload pl;
     pl.getPayload(msg + 6, msglen - 6);
-    _publishedFlg = 1;
+    _publishedFlg = NEG_TASK_INDEX;
     theClient->getTopicTable()->execCallback(getUint16(msg + 2), &pl, msg[1] & 0x03);
-    _publishedFlg = 0;
+    _publishedFlg = SAVE_TASK_INDEX;
 }
 
 void PublishManager::checkTimeout(void){
@@ -340,11 +341,11 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 	elm->retryCount = MQTTSN_RETRY_COUNT;
 	elm->sendUTC = 0;
 
-	if (_publishedFlg == 0){
+	if (_publishedFlg == NEG_TASK_INDEX){
+		elm->taskIndex = -1;
+	}else{
 		elm->taskIndex = theClient->getTaskManager()->getIndex();
 		theClient->getTaskManager()->suspend(elm->taskIndex);
-	}else{
-		elm->taskIndex = -1;
 	}
 
 	while(last){

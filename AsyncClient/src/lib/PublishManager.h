@@ -71,6 +71,9 @@ namespace tomyAsyncClient {
 #define WAIT_PUBREL         4
 #define WAIT_PUBCOMP        5
 
+#define SAVE_TASK_INDEX     1
+#define NEG_TASK_INDEX      0
+
 
 typedef struct PubElement{
     uint16_t  msgId;
