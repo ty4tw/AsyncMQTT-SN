@@ -323,7 +323,7 @@ uint8_t* Network::getResponce(int* len){
 }
 
 bool Network::readApiFrame(uint16_t timeoutMillsec){
-    _pos = 0;
+	_available = _errorCode = _pos = 0;
     _tm.start((uint32_t)timeoutMillsec);
 
     while (!_tm.isTimeUp()){

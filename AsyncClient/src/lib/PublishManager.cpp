@@ -70,7 +70,7 @@ PublishManager::~PublishManager(){
 	while (elm){
 		sav = elm->next;
 		if (elm != 0){
-			free(elm);
+			delElement(elm);
 		}
 		elm = sav;
 	}
@@ -107,11 +107,11 @@ void PublishManager::sendPublish(PubElement* elm){
         msg[0] = (uint8_t)elm->payload->getLen() + 7;
     }
     msg[org + 1] = MQTTSN_TYPE_PUBLISH;
-    msg[org + 2] = elm->_flag;
+    msg[org + 2] = elm->flag;
     if ((elm->retryCount < MQTTSN_RETRY_COUNT)){
         msg[org + 2] = msg[org + 2] | MQTTSN_FLAG_DUP;
     }
-    if ((elm->_flag & 0x03) == MQTTSN_TOPIC_TYPE_SHORT){
+    if ((elm->flag & 0x03) == MQTTSN_TOPIC_TYPE_SHORT){
         memcpy( msg + org + 3, elm->topicName, 2);
     }else{
         setUint16(msg + org + 3, elm->topicId);
@@ -121,12 +121,12 @@ void PublishManager::sendPublish(PubElement* elm){
 
 	theClient->getGwProxy()->writeMsg(msg);
 	theClient->getGwProxy()->resetPingReqTimer();
-    if (( elm->_flag & 0x60) == MQTTSN_FLAG_QOS_0){
+    if (( elm->flag & 0x60) == MQTTSN_FLAG_QOS_0){
         remove(elm);  // PUBLISH Done
         return;
-    }else if ((elm->_flag & 0x60) == MQTTSN_FLAG_QOS_1){
+    }else if ((elm->flag & 0x60) == MQTTSN_FLAG_QOS_1){
         elm->status = WAIT_PUBACK;
-    }else if ((elm->_flag & 0x60) == MQTTSN_FLAG_QOS_2){
+    }else if ((elm->flag & 0x60) == MQTTSN_FLAG_QOS_2){
         elm->status = WAIT_PUBREC;
     }
     
@@ -140,7 +140,7 @@ void PublishManager::sendSuspend(const char* topicName, uint16_t topicId, uint8_
 	while (elm){
 		if (strcmp(elm->topicName, topicName) == 0 && elm->status == TOPICID_IS_SUSPEND){
 			elm->topicId = topicId;
-			elm->_flag |= topicType;
+			elm->flag |= topicType;
 			elm->status = TOPICID_IS_READY;
 			sendPublish(elm);
 			elm = 0;
@@ -279,22 +279,27 @@ void PublishManager::remove(PubElement* elm){
     			elm->next->prev = 0;
     		}
             delete elm->payload;
-    		theClient->getTaskManager()->done(elm->taskIndex);
-    		free(elm);
+            delElement(elm);
     	}else{
     		elm->prev->next = elm->next;
-    		theClient->getTaskManager()->done(elm->taskIndex);
-    		free(elm);
+    		delElement(elm);
     	}
         _elmCnt--;
     }
+}
+
+void PublishManager::delElement(PubElement* elm){
+	if (elm->taskIndex >= 0){
+		theClient->getTaskManager()->done(elm->taskIndex);
+	}
+	free(elm);
 }
 
 
 PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload* payload, uint8_t qos, uint8_t retain, uint16_t msgId){
     PubElement* last = _first;
 	PubElement* prev = _first;
-	PubElement* elm = (PubElement*) calloc(1,sizeof(PubElement));
+	PubElement* elm = (PubElement*)calloc(1,sizeof(PubElement));
 
 	if (elm == 0){
 		return 0;
@@ -307,28 +312,29 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 
 	if (strlen(topicName) == 2){
         topicId = 0;
-        elm->_flag |= MQTTSN_TOPIC_TYPE_SHORT;
+        elm->flag |= MQTTSN_TOPIC_TYPE_SHORT;
     }else if (strlen(topicName) > 2){
         topicId = theClient->getTopicTable()->getTopicId((char*)topicName);
-        elm->_flag |= MQTTSN_TOPIC_TYPE_NORMAL;
+        elm->flag |= MQTTSN_TOPIC_TYPE_NORMAL;
     }else{
-		elm->_flag |= MQTTSN_TOPIC_TYPE_PREDEFINED;
+		elm->flag |= MQTTSN_TOPIC_TYPE_PREDEFINED;
 	}
     if (qos == 0){
-        elm->_flag |= MQTTSN_FLAG_QOS_0;
+        elm->flag |= MQTTSN_FLAG_QOS_0;
     }else if ( qos == 1){
-        elm->_flag |= MQTTSN_FLAG_QOS_1;
+        elm->flag |= MQTTSN_FLAG_QOS_1;
     }else if (qos == 2){
-        elm->_flag |= MQTTSN_FLAG_QOS_2;
+        elm->flag |= MQTTSN_FLAG_QOS_2;
     }
     if (retain){
-        elm->_flag |= MQTTSN_FLAG_RETAIN;
+        elm->flag |= MQTTSN_FLAG_RETAIN;
     }
 
     if (topicId){
         elm->status = TOPICID_IS_READY;
         elm->topicId = topicId;
     }
+
     elm->payload = payload;
 	elm->msgId = msgId;
 	elm->retryCount = MQTTSN_RETRY_COUNT;
@@ -338,7 +344,7 @@ PubElement* PublishManager::add(const char* topicName, uint16_t topicId, Payload
 		elm->taskIndex = theClient->getTaskManager()->getIndex();
 		theClient->getTaskManager()->suspend(elm->taskIndex);
 	}else{
-		elm->taskIndex = 0;
+		elm->taskIndex = -1;
 	}
 
 	while(last){

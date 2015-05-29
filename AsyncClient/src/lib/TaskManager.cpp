@@ -74,7 +74,7 @@ void TaskManager::run(void){
 	while (true){
 		theClient->getGwProxy()->getResponce();
 
-		for (uint8_t _index = 0; _task[_index].callback > 0; _index++){
+		for (_index = 0; _task[_index].callback > 0; _index++){
 			if ((_task[_index].prevTime + _task[_index].interval < Timer::getUnixTime()) &&
 				 _task[_index].status == TASK_DONE){
 				_task[_index].prevTime = Timer::getUnixTime();
@@ -100,9 +100,9 @@ uint8_t TaskManager::getIndex(void){
 }
 
 void TaskManager::done(uint8_t index){
-	_task[_index].status = TASK_DONE;
+	_task[index].status = TASK_DONE;
 }
 
 void TaskManager::suspend(uint8_t index){
-	_task[_index].status = TASK_SUSPEND;
+	_task[index].status = TASK_SUSPEND;
 }

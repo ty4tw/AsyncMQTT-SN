@@ -80,11 +80,11 @@ typedef struct PubElement{
     uint32_t  sendUTC;
     int       (*callback)(void);
     int       retryCount;
+    int       taskIndex;
     PubElement* prev;
     PubElement* next;
-    uint8_t   _flag;
+    uint8_t   flag;
     uint8_t   status;  // 0:SUSPEND, 1:READY
-    uint8_t   taskIndex;
 } PubElement;
 
 /*========================================
@@ -109,9 +109,8 @@ private:
 	void remove(PubElement* elm);
 	void sendPublish(PubElement* elm);
     void sendPubAck(uint16_t topicId, uint16_t msgId, uint8_t rc);
-    //void sendPubRec(PubElement* elm);
     void sendPubRel(PubElement* elm);
-    //void sendPubComp(PubElement* elm);
+    void delElement(PubElement* elm);
 	PubElement* _first;
 	uint8_t     _elmCnt;
 	uint8_t     _publishedFlg;
