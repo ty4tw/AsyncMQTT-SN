@@ -5,8 +5,8 @@ Async MQTT-SN  over UDP and XBee
 *  Design concept of Async client is defferent from Sync one. No more MQTT-SN Message classes.    
 *  Program size of Async client for Arduino is 16KB.  previous Sync one is 24KB.    
 *  Gateway is changed to support Async PUBACK and SUBACK, DISCONNECT　responce.    
-　　　　
-For details, see Wiki
+
+For details, see Wiki    
 
 Supported functions
 -------------------
