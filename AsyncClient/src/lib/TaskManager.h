@@ -41,12 +41,6 @@
 
 #ifdef ARDUINO
   #include <Timer.h>
-
-  #if defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG)
-        #include <SoftwareSerial.h>
-        extern SoftwareSerial debug;
-  #endif
-
 #endif  /* ARDUINO */
 
 
@@ -63,12 +57,9 @@ struct TaskList{
     void     (*callback)(void);
 	uint32_t interval;
     uint32_t prevTime;
-    uint8_t  status;
+    uint8_t  count;
 };
 
-
-#define TASK_DONE    0
-#define TASK_SUSPEND 1
 
 /*========================================
        Class TaskManager

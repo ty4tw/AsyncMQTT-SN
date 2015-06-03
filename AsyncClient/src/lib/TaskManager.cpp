@@ -54,12 +54,12 @@
 using namespace std;
 using namespace tomyAsyncClient;
 extern MqttsnClient* theClient;
-extern int getFreeMemory();
 /*=====================================
            TaskManager
  ======================================*/
 TaskManager::TaskManager(void){
 	_task = 0;
+	_index = 0;
 }
 
 TaskManager::~TaskManager(void){
@@ -76,14 +76,13 @@ void TaskManager::run(void){
 
 		for (_index = 0; _task[_index].callback > 0; _index++){
 			if ((_task[_index].prevTime + _task[_index].interval < Timer::getUnixTime()) &&
-				 _task[_index].status == TASK_DONE){
+				 _task[_index].count == 0){
 				_task[_index].prevTime = Timer::getUnixTime();
 				(_task[_index].callback)();
 			}
 		}
 
 		do{
-			theClient->getGwProxy()->getResponce();
 			theClient->getGwProxy()->getResponce();
 		}while(theClient->getPublishManager()->isMaxFlight() ||
 			   !theClient->getSubscribeManager()->isDone() ||
@@ -100,9 +99,11 @@ uint8_t TaskManager::getIndex(void){
 }
 
 void TaskManager::done(uint8_t index){
-	_task[index].status = TASK_DONE;
+	if (_task[index].count > 0){
+		_task[index].count--;
+	}
 }
 
 void TaskManager::suspend(uint8_t index){
-	_task[index].status = TASK_SUSPEND;
+	_task[index].count++;
 }

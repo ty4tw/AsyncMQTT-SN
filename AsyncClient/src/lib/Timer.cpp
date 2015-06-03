@@ -54,10 +54,10 @@ using namespace tomyAsyncClient;
 /**
  *   for Arduino
  */
-uint32_t Timer::_unixTime;
-uint32_t Timer::_epochTime;
-uint32_t Timer::_timerStopTimeAccum;
-bool    Timer::_utcFlag;
+uint32_t Timer::_unixTime = 0;
+uint32_t Timer::_epochTime = 0;
+uint32_t Timer::_timerStopTimeAccum = 0;
+bool    Timer::_utcFlag = false;
 
 
 Timer::Timer(){
