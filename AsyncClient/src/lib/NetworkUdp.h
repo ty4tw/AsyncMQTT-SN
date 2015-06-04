@@ -118,7 +118,6 @@ private:
 	EthernetUDP _udpUnicast;
 	EthernetUDP _udpMulticast;
 	IPAddress   _gIpAddr;
-	IPAddress   _cIpAddr;
 	uint16_t    _gPortNo;
 	uint16_t    _uPortNo;
 	uint8_t*    _macAddr;

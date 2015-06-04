@@ -38,9 +38,9 @@ UDP_APP_CONFIG = {
         "ArduinoEther",
         {225,1,1,1},         // Multicast group IP
         1883,                // Multicast group Port
-        {192,168,11,18},     // Local IP     (for Arduino App)
+        {0,0,0,0},           // Local IP for Arduino without DHCP server.
         12001,               // Local PortNo
-        {0x90,0xa2,0xda,0x0f,0x53,0xa5}       // MAC address  (for Arduino App)
+        {0x00,0x00,0x00,0x00,0x00,0x00}       // MAC address of Arduino
     },
     {
         300,            //KeepAlive

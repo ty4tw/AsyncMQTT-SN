@@ -181,7 +181,11 @@ bool UdpPort::open(UdpConfig config){
 
 	memcpy(_macAddr, config.macAddr, 6);
 
-	Ethernet.begin(_macAddr, _cIpAddr);
+	if (config.ipLocal[0] == 0 && config.ipLocal[1] == 0 && config.ipLocal[2] == 0 && config.ipLocal[3] == 0){
+		Ethernet.begin(_macAddr);
+	}else{
+		Ethernet.begin(_macAddr, _cIpAddr);
+	}
 
 	if(_udpMulticast.beginMulti(_gIpAddr, _gPortNo) == 0){
 		return false;
