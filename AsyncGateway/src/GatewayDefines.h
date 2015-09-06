@@ -40,7 +40,7 @@
 
 #define KEEP_ALIVE_TIME   900    // 900 sec = 15 min
 
-#define TIMEOUT_PERIOD     10    //  10 sec = 10 sec
+#define TIMEOUT_PERIOD  10000    //  10000 msec = 10 sec
 
 #define SEND_UNIXTIME_TIME 30    // 30sec after KEEP_ALIVE_TIME
 
