@@ -266,7 +266,7 @@ void ClientNode::setKeepAlive(MQTTSnMessage* msg){
 }
 
 bool ClientNode::isConnectSendable(){
-	if(_status == Cstat_Connecting || _status == Cstat_TryConnecting){
+	if(_status == Cstat_Lost || _status == Cstat_TryConnecting){
 		return false;
 	}else{
 		return true;
