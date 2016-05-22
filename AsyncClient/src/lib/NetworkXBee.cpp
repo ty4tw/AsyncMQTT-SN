@@ -169,10 +169,10 @@ void SerialPort::rtsOn(void){
 SerialPort::SerialPort(){
 	memset(&_tio, 0, sizeof(termios));
     _tio.c_iflag = IGNBRK | IGNPAR;
-#ifdef XBEE_FLOWCTRL_CRTSCTS
-    _tio.c_cflag = CS8 | CLOCAL | CREAD | CRTSCTS;
+#ifdef XBEE_FLOWCTL_CRTSCTS
+    _tio.c_cflag = CS8 | CLOCAL | CRTSCTS;
 #else
-    _tio.c_cflag = CS8 | CLOCAL | CREAD;
+    _tio.c_cflag = CS8 | CLOCAL;
 #endif
     _tio.c_cc[VINTR] = 0;
     _tio.c_cc[VTIME] = 0;
@@ -271,11 +271,11 @@ Network::Network(){
     _serialPort = new SerialPort();
     _returnCode = 0;
     _tm.stop();
-    _pos = 0;
-    _esc = false;
-    _checksumTotal = 0;
+
+
     _sleepflg = false;
     resetGwAddress();
+    _frameId = 0;
 }
 
 Network::~Network(){
@@ -292,15 +292,14 @@ void Network::setSleep(){
 }
 
 void Network::setGwAddress(){
-    _gwAddrMsb = getUint32(_responseData + 4);
-    _gwAddrLsb = getUint32(_responseData + 8);
-    _gwAddr16 = getUint16(_responseData + 12);
+    memcpy(_gwAddr64, _responseData + 2, 8);
+    memcpy(_gwAddr16, _responseData + 10, 2);
+
 }
 
 void Network::resetGwAddress(void){
-    _gwAddrMsb = 0;
-    _gwAddrLsb = 0;
-    _gwAddr16 = 0;
+	memset(_gwAddr64, 0, 8);
+	memset(_gwAddr16, 0, 2);
 }
 
 void Network::setSerialPort(SerialPort *serialPort){
@@ -312,7 +311,7 @@ uint8_t* Network::getResponce(int* len){
 	_serialPort->rtsOn();
 	if(_serialPort->checkRecvBuf()){
 		if(readApiFrame(PACKET_TIMEOUT_CHECK)){
-			if(_responseData[API_ID_POS] == XB_API_RESPONSE){
+			if(_responseData[0] == XB_API_RESPONSE){
 				*len = _respLen - 15;
 				_mqttsnMsg = _responseData + 15;
 				return _mqttsnMsg;
@@ -323,109 +322,93 @@ uint8_t* Network::getResponce(int* len){
 	return 0;
 }
 
-bool Network::readApiFrame(uint16_t timeoutMillsec){
-	_available = _errorCode = _pos = 0;
+uint8_t Network::readApiFrame(uint16_t timeoutMillsec)
+{
+	uint8_t buff;
+	uint8_t flg = 0;
     _tm.start((uint32_t)timeoutMillsec);
 
-    while (!_tm.isTimeUp()){
-
-        readApiFrame();
-
-        if (_available){
-        	D_NWA(F("<=== CheckSum OK\r\n\n"));
-        	D_NWL("<=== CheckSum OK\r\n\n");
-            if (_responseData[API_ID_POS] == XB_API_RESPONSE){
-				if (_gwAddr16 &&
-					(_responseData[14] & 0x02 ) != 0x02 &&
-					(_gwAddrMsb != getUint32(_responseData + 4) &&
-					(_gwAddrLsb != getUint32(_responseData + 8)))){
-					D_NWL("  Sender is not Gateway!\r\n" );
-					return false;
-				}
-            	return true;
-            }else if (_responseData[API_ID_POS] == XB_API_MODEMSTATUS){
-            	return true;
-            }
-        }else if (_errorCode == CHECKSUM_ERROR ){
-        	D_MQTTA(F("  ! CHECKSUM ERROR  MsgType = "));
-        	D_MQTTA(_responseData[16], HEX);
-        	D_MQTTALN();
-        	D_MQTTL("  ! CHECKSUM ERROR  MsgType = %x\r\n", _responseData[16]);
-        	D_NWA(F("<=== CHECKSUM ERROR\r\n"));
-        	D_NWL("<=== CHECKSUM ERROR\r\n");
-            return false;
-        }else if (_errorCode){
-        	D_MQTTA(F("   ! Packet Error Code =") );
-			D_MQTTA(_responseData[16], HEX);
-        	D_MQTTALN();
-        	D_MQTTL("   ! Packet Error Code = %d\r\n",_errorCode);
-        	D_NWA(F("<=== Packet Error Code = "));
-        	D_NWA(_errorCode, HEX);
-        	D_NWALN();
-			D_NWL("<=== Packet Error Code = %d\r\n",_errorCode);
-			return false;
-        }
+    while (!_tm.isTimeUp())
+    {
+    	_serialPort->recv(&buff);
+    	if ( buff == START_BYTE)
+		{
+			_checksum = 0;
+			flg = 1;
+			D_NWA(F(" ===> Recv:    "));
+			D_NWL(" ===> Recv:    ");
+			break;
+		}
     }
-    return false;   //Timeout
+
+    if ( flg != 1 )
+    {
+    	return 0;
+    }
+
+    /* get packet */
+    if ( readApiFrame() > 0 )
+    {
+    	if (_responseData[0] == XB_API_RESPONSE)
+    	{
+    		if ( memcmp(_gwAddr64, _responseData + 2, 8) != 0 &&
+				(_responseData[12] & 0x02)  != 0x02 )
+    		{
+				D_NWL("  Sender is not Gateway!\r\n" );
+				return 0;
+			}
+    		else
+    		{
+    			return 1;  // recieve Response
+    		}
+    	}
+		else if (_responseData[0] == XB_API_MODEMSTATUS)
+		{
+			return 0;
+		}
+		else if (_responseData[0] == XB_API_XMITSTATUS)
+		{
+			return 2;  // recieve Ack
+		}
+    }
+	return 0;
 }
 
-void Network::readApiFrame(){
+uint8_t Network::readApiFrame(){
+	uint8_t buf;
+	uint8_t pos = 0;
+	uint8_t checksum = 0;
+	uint8_t len = 0;
 
-    if (_available || _errorCode){
-      _available = _errorCode = _pos = 0;
+   	recvByte(&buf);  // MSB length
+    recvByte(&buf);  // LSB length
+
+    len = buf;
+
+    pos = 0;
+    while ( len-- )
+    {
+    	recvByte(&buf);
+    	_responseData[pos++] = buf;
+    	checksum += buf;
     }
 
-    while (read(&_byteData )){
+	recvByte(&buf);   // checksum
 
-        if ( _byteData == START_BYTE){
-            _pos = 1;
-            _checksumTotal = 0;
-            D_NWA(F("\r\n===> Recv:    "));
-            D_NWL("\r\n===> Recv:    ");
-            continue;
-        }
-
-        if (_pos > 0 && _byteData == ESCAPE){
-          if (read(&_byteData )){
-              _byteData = 0x20 ^ _byteData;  // decode
-          }else{
-              _esc = true;
-              continue;
-          }
-        }
-
-        if (_esc){
-            _byteData = 0x20 ^ _byteData;
-            _esc = false;
-        }
-
-        if (_pos >= API_ID_POS){
-            _checksumTotal += _byteData;
-        }
-        if ( _pos > 0){
-            if (_pos > MQTTSN_MAX_MSG_LENGTH){
-            	_errorCode = PACKET_OVERFLOW;
-              _pos = 0;
-              return;
-            }else if (_pos > 2 && _pos == _responseData[2] + 3){
-              if ((_checksumTotal & 0xff) == 0xff){
-                  _available = 1;
-                  _errorCode = NO_ERROR;
-              }else{
-            	  _errorCode = CHECKSUM_ERROR;
-              }
-              _respLen = _pos;
-              _pos = 0;
-              _checksumTotal = 0;
-              return;
-            }else{
-            	_responseData[_pos] = _byteData;
-            }
-        }
-        _pos++;
-
-
+    if ( (0xff - checksum ) == buf ){
+    	D_NWA(F("    checksum ok\r\n"));
+    	D_NWL("    checksum ok\r\n");
+    	return pos;
     }
+    else
+    {
+    	D_NWA(F("    checksum error\r\n"));
+    	D_NWL("    checksum error\r\n");
+    	goto errexit;
+    }
+errexit:
+	_serialPort->flush();
+	return 0;
 }
 
 int Network::broadcast(const uint8_t* payload, uint16_t payloadLen){
@@ -438,39 +421,46 @@ int Network:: unicast(const uint8_t* payload, uint16_t payloadLen){
 	return 1;
 }
 
-void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
+uint8_t Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
 	D_NWA(F("\r\n===> Send:    "));
 	D_NWL("\r\n===> Send:    ");
     uint8_t checksum = 0;
     uint8_t addrBuff[4];
 
-    write(START_BYTE);
+    _serialPort->send(START_BYTE);
     sendByte(0x00);              // Message Length
     sendByte(14 + pLen);         // Message Length
 
     sendByte(XB_API_REQUEST);    // API
     checksum+= XB_API_REQUEST;
 
-    write(0x00);                 // Frame ID
+    if ( _frameId++ == 0 )
+    {
+    	_frameId = 1;
+    }
+    _serialPort->send(_frameId);                 // Frame ID
+    checksum += _frameId;
 
     if (unicast){
-    	setUint32(addrBuff, _gwAddrMsb); // Gateway Address64
-    	sendAddr(addrBuff, 4, &checksum);
-
-    	setUint32(addrBuff, _gwAddrLsb);
-    	sendAddr(addrBuff, 4, &checksum);
-
-		setUint16(addrBuff, _gwAddr16);
-		sendAddr(addrBuff, 2, &checksum);
+    	for ( uint8_t i = 0; i < 8; i++)
+    	{
+    		_serialPort->send(_gwAddr64[i]);
+    		checksum += _gwAddr64[i];
+    	}
+    	for ( uint8_t i = 0; i < 2; i++)
+		{
+			_serialPort->send(_gwAddr16[i]);
+			checksum += _gwAddr16[i];
+		}
     }else{
 		for (uint8_t i = 0; i < 6; i++){
-			write(0x00);   // Broadcast Address64  00 00 00 00 00 00
+			_serialPort->send(0x00);   // Broadcast Address64  00 00 00 00 00 00
 		}
 		for (uint8_t i = 0; i < 3; i++){
-			write(0xFF);   // Broadcast Address64  FF FF
+			_serialPort->send(0xFF);   // Broadcast Address64  FF FF
 			checksum += 0xFF;
 		}
-		write(0xFE);       // Broadcast Address16  FF FE
+		_serialPort->send(0xFE);       // Broadcast Address16  FF FE
 		checksum += 0xFE;
     }
 
@@ -491,30 +481,58 @@ void Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     D_NWALN();
     D_NWL("\r\n");
     //flush();
-}
 
-void Network::sendAddr(uint8_t* addr, uint8_t len, uint8_t* checksum){
-	for (int i = 0; i < len; i++){
-		sendByte(addr[i]);   // Gateway Address 64 & 16
-		*checksum += addr[i];
-	}
+    if ( readApiFrame(10000) == 2 )
+    {
+    	return 1;
+    }
+    else
+    {
+    	printf("XmitStatus Timeout\n");
+    	return 0;
+    }
+
 }
 
 void Network::sendByte(uint8_t b){
   if(b == START_BYTE || b == ESCAPE || b == XON || b == XOFF){
-      write(ESCAPE);
-      write(b ^ 0x20);
+	  _serialPort->send(ESCAPE);
+	  _serialPort->send(b ^ 0x20);
   }else{
-      write(b);
+	  _serialPort->send(b);
   }
 }
 
-void Network::write(uint8_t val){
-	_serialPort->send(val);
+int Network::recvByte(uint8_t* buf)
+{
+	bool flg;
+	_tm.start(1000);
+	do
+	{
+		flg = _serialPort->recv(buf);
+	}
+	while ( !flg && !_tm.isTimeUp() );
+
+	if ( flg )
+	{
+		if ( *buf == ESCAPE)
+		{
+			_tm.start(1000);
+			do
+			{
+				flg = _serialPort->recv(buf);
+			}
+			while ( !flg && !_tm.isTimeUp() );
+			if ( !flg )
+			{
+				return -1;
+			}
+			*buf = 0x20 ^ *buf;
+		}
+		return 0;
+	}
+	return -1;
 }
 
-bool Network::read(uint8_t *buff){
-	return  _serialPort->recv(buff);
-}
 
 #endif  /* NETWORK_XBEE */
