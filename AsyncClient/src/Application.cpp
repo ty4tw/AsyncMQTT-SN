@@ -60,7 +60,7 @@ extern MqttsnClient* theClient;
  XBEE_APP_CONFIG = {
     {
     	"client01",     //ClientId
-        38400,          //Baudrate
+		57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         "/dev/ttyUSB0"               //Device (for linux App)
     },
@@ -110,7 +110,7 @@ void task1(void){
   Payload* pl = new Payload(10);
   onoffFlg = !onoffFlg;
   pl->set_bool(onoffFlg);
-  PUBLISH(topic2,pl,2);
+  PUBLISH(topic2,pl,1);
 }
 
 void task2(void){

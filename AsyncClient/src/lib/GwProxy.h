@@ -104,7 +104,7 @@ public:
 	void     initialize(APP_CONFIG config);
 	void     connect(void);
 	void     disconnect(uint16_t sec = 0);
-	int      getResponce(void);
+	int      getMessage(void);
 	uint16_t registerTopic(char* topic, uint16_t toipcId);
 
 	void     setWillTopic(const char* willTopic, uint8_t qos, bool retain = false);

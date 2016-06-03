@@ -72,8 +72,7 @@ void TaskManager::add(TaskList* task){
 
 void TaskManager::run(void){
 	while (true){
-		theClient->getGwProxy()->getResponce();
-
+		theClient->getGwProxy()->getMessage();
 		for (_index = 0; _task[_index].callback > 0; _index++){
 			if ((_task[_index].prevTime + _task[_index].interval < Timer::getUnixTime()) &&
 				 _task[_index].count == 0){
@@ -83,7 +82,7 @@ void TaskManager::run(void){
 		}
 
 		do{
-			theClient->getGwProxy()->getResponce();
+			theClient->getGwProxy()->getMessage();
 		}while(theClient->getPublishManager()->isMaxFlight() ||
 			   !theClient->getSubscribeManager()->isDone() ||
 			   !theClient->getRegisterManager()->isDone());

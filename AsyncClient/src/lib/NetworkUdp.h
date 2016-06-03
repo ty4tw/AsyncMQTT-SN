@@ -145,7 +145,7 @@ public:
     void resetGwAddress(void);
     void setFixedGwAddress(void);
     bool initialize(NETWORK_CONFIG  config);
-    uint8_t*  getResponce(int* len);
+    uint8_t*  getMessage(int* len);
 private:
     void setSleep();
     int  readApiFrame(void);

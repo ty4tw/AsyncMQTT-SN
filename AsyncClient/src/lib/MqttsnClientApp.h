@@ -38,7 +38,7 @@
 *****************************************/
 
 /*-------- Select Network  -------------*/
-#define NETWORK_UDP
+//#define NETWORK_UDP
 
 
 #if ! defined(NETWORK_UDP) && ! defined (NETWORK_XXXXX)
@@ -52,7 +52,7 @@
 
 /*--- XBee Buffer Flow Control --*/
 #ifdef NETWORK_XBEE
-	#define XBEE_FLOWCTL_CRTSCTS
+	//#define XBEE_FLOWCTL_CRTSCTS
 #endif
 
 /*======================================
@@ -63,7 +63,7 @@
 /*======================================
  *         Debug Flag
  ======================================*/
-//#define DEBUG_NW
+#define DEBUG_NW
 //#define DEBUG_MQTTSN
 
 /****************************************

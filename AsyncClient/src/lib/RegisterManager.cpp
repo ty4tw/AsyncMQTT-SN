@@ -193,7 +193,7 @@ void RegisterManager::responceRegAck(uint16_t msgId, uint16_t topicId){
 }
 
 void RegisterManager::responceRegister(uint8_t* msg, uint16_t msglen){
-	// *msg is terminated with 0x00 by Network::getResponce()
+	// *msg is terminated with 0x00 by Network::getMessage()
 	uint8_t regack[7];
 	regack[0] = 7;
 	regack[1] = MQTTSN_TYPE_REGACK;

@@ -101,7 +101,7 @@ int  Network::unicast(const uint8_t* xmitData, uint16_t dataLen){
 }
 
 
-uint8_t*  Network::getResponce(int* len){
+uint8_t*  Network::getMessage(int* len){
 	*len = 0;
 	if (checkRecvBuf()){
 		uint16_t recvLen = UdpPort::recv(_rxDataBuf, MQTTSN_MAX_PACKET_SIZE, false, &_ipAddress, &_portNo);

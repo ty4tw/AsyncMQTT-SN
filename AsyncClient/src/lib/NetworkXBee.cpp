@@ -227,7 +227,9 @@ int SerialPort::open(XBeeConfig config){
 }
 
 bool SerialPort::checkRecvBuf(){
-    return true;
+	int rc;
+    ioctl(_fd, FIONREAD, &rc);
+    return rc > 0 ;
 }
 
 bool SerialPort::send(unsigned char b){
@@ -292,8 +294,8 @@ void Network::setSleep(){
 }
 
 void Network::setGwAddress(){
-    memcpy(_gwAddr64, _responseData + 2, 8);
-    memcpy(_gwAddr16, _responseData + 10, 2);
+    memcpy(_gwAddr64, _responseData + 1, 8);
+    memcpy(_gwAddr16, _responseData + 9, 2);
 
 }
 
@@ -306,15 +308,15 @@ void Network::setSerialPort(SerialPort *serialPort){
   _serialPort = serialPort;
 }
 
-uint8_t* Network::getResponce(int* len){
+uint8_t* Network::getMessage(int* len){
 	memset(_responseData, 0, MQTTSN_MAX_PACKET_SIZE + 1);
 	_serialPort->rtsOn();
+
 	if(_serialPort->checkRecvBuf()){
-		if(readApiFrame(PACKET_TIMEOUT_CHECK)){
+		if( (readApiFrame(PACKET_TIMEOUT_CHECK)) ){
 			if(_responseData[0] == XB_API_RESPONSE){
-				*len = _respLen - 15;
-				_mqttsnMsg = _responseData + 15;
-				return _mqttsnMsg;
+				*len = _packetLen - 12;
+				return _responseData + 12;
 			}
 		}
 	}
@@ -351,7 +353,7 @@ uint8_t Network::readApiFrame(uint16_t timeoutMillsec)
     {
     	if (_responseData[0] == XB_API_RESPONSE)
     	{
-    		if ( memcmp(_gwAddr64, _responseData + 2, 8) != 0 &&
+    		if ( memcmp(_gwAddr64, _responseData + 1, 8) != 0 &&
 				(_responseData[12] & 0x02)  != 0x02 )
     		{
 				D_NWL("  Sender is not Gateway!\r\n" );
@@ -385,20 +387,21 @@ uint8_t Network::readApiFrame(){
 
     len = buf;
 
-    pos = 0;
     while ( len-- )
     {
     	recvByte(&buf);
     	_responseData[pos++] = buf;
     	checksum += buf;
     }
+    _packetLen = 0;
 
 	recvByte(&buf);   // checksum
 
     if ( (0xff - checksum ) == buf ){
     	D_NWA(F("    checksum ok\r\n"));
     	D_NWL("    checksum ok\r\n");
-    	return pos;
+    	_packetLen = pos;
+    	return 1;
     }
     else
     {
@@ -412,20 +415,17 @@ errexit:
 }
 
 int Network::broadcast(const uint8_t* payload, uint16_t payloadLen){
-	send(payload, (uint8_t) payloadLen, 0);
-	return 1;
+	return send(payload, (uint8_t) payloadLen, 0);
 }
 
 int Network:: unicast(const uint8_t* payload, uint16_t payloadLen){
-	send(payload, (uint8_t) payloadLen, 1);
-	return 1;
+	return send(payload, (uint8_t) payloadLen, 1);
 }
 
 uint8_t Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
 	D_NWA(F("\r\n===> Send:    "));
 	D_NWL("\r\n===> Send:    ");
     uint8_t checksum = 0;
-    uint8_t addrBuff[4];
 
     _serialPort->send(START_BYTE);
     sendByte(0x00);              // Message Length
@@ -480,18 +480,17 @@ uint8_t Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     sendByte(checksum);
     D_NWALN();
     D_NWL("\r\n");
-    //flush();
 
-    if ( readApiFrame(10000) == 2 )
+    if ( readApiFrame(4000) == 2 )  // expect Xmit status message while 4 secs
     {
     	return 1;
     }
     else
     {
-    	printf("XmitStatus Timeout\n");
+    	D_NWA(F("XmitStatus Timeout\r\n"));
+		D_NWL("XmitStatus Timeout\r\n");
     	return 0;
     }
-
 }
 
 void Network::sendByte(uint8_t b){

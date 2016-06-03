@@ -81,7 +81,7 @@ using namespace std;
 #define XB_BROADCAST_PACKET          0x02
 #define XB_BROADCAST_RADIUS_MAX_HOPS 0
 
-#define PACKET_TIMEOUT_CHECK         50   // 50ms
+#define PACKET_TIMEOUT_CHECK         1000   // 1 sec
 
 /*====  STATUS ======
 #define NO_ERROR               0
@@ -148,7 +148,7 @@ public:
     void     setGwAddress();
     void     resetGwAddress(void);
     int      initialize(NETWORK_CONFIG  config);
-    uint8_t* getResponce(int* len);
+    uint8_t* getMessage(int* len);
 
 private:
     void setSleep();
@@ -160,8 +160,7 @@ private:
     int  recvByte(uint8_t*);
 
     uint8_t     _responseData[MQTTSN_MAX_PACKET_SIZE + 1];
-    uint8_t*    _mqttsnMsg;
-    int         _respLen;
+    uint8_t     _packetLen;
     Timer       _tm;
 
     SerialPort* _serialPort;

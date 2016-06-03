@@ -248,7 +248,7 @@ int GwProxy::getDisconnectResponce(void){
 	return 0;
 }
 
-int GwProxy::getResponce(void){
+int GwProxy::getMessage(void){
 	int len = readMsg();
 	if (len < 0){
 		return len;   //error
@@ -364,7 +364,7 @@ void GwProxy::writeGwMsg(void){
 
 int GwProxy::readMsg(void){
 	int len = 0;
-	_mqttsnMsg = _network.getResponce(&len);
+	_mqttsnMsg = _network.getMessage(&len);
 	if (len == 0){
 		return 0;
 	}else if (len < 0){
@@ -375,6 +375,7 @@ int GwProxy::readMsg(void){
 		}
 		return -1;
 	}
+
 	if (_mqttsnMsg[0] == 0x01){
 		int msgLen = (int) getUint16((const uint8_t*)_mqttsnMsg + 1);
 		if (len != msgLen){
