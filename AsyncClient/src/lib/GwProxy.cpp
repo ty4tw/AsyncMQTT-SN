@@ -367,14 +367,15 @@ int GwProxy::readMsg(void){
 	_mqttsnMsg = _network.getMessage(&len);
 	if (len == 0){
 		return 0;
-	}else if (len < 0){
+	}
+	/*else if (len < 0){
 		if ( _status < GW_CONNECTING){
 			_status = GW_LOST;
 		}else{
 			_status = GW_CONNECTING;
 		}
 		return -1;
-	}
+	}*/
 
 	if (_mqttsnMsg[0] == 0x01){
 		int msgLen = (int) getUint16((const uint8_t*)_mqttsnMsg + 1);
@@ -452,11 +453,11 @@ void GwProxy::checkPingReq(void){
 
 void GwProxy::checkAdvertise(void){
 	if ( _gwAliveTimer.isTimeUp()){
-		//_status = GW_LOST;
-		//_gwId = 0;
-		//_pingStatus = 0;
+		_status = GW_LOST;
+		_gwId = 0;
+		_pingStatus = 0;
 		_gwAliveTimer.stop();
-		//_keepAliveTimer.stop();
+		_keepAliveTimer.stop();
 		D_MQTTA(F("   !!! ADVERTISE Timeout\n"));
 		D_MQTTL("   !!! ADVERTISE Timeout\n");
 	}

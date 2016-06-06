@@ -182,13 +182,13 @@ void MqttsnClient::run(void){
     }
 }
 
-
+/*
 int tomyAsyncClient::setUTC(Payload* pl){
 	uint32_t utc = getUint32((const uint8_t*)pl->getRowData());
 	Timer::setUnixTime(utc);
 	return 0;
 }
-
+*/
 
 void MqttsnClient::onConnect(void){
 
@@ -196,7 +196,7 @@ void MqttsnClient::onConnect(void){
 	 *    subscribe() for Predefined TopicId
 	 */
     #ifdef ARDUINO
-	subscribe(MQTTSN_TOPICID_PREDEFINED_TIME, setUTC, 0, MQTTSN_TOPIC_TYPE_PREDEFINED);
+	//subscribe(MQTTSN_TOPICID_PREDEFINED_TIME, setUTC, 0, MQTTSN_TOPIC_TYPE_PREDEFINED);
     #endif
 
 	for(uint8_t i = 0; theOnPublishList[i].pubCallback; i++){

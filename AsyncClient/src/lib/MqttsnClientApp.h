@@ -51,9 +51,8 @@
 
 
 /*--- XBee Buffer Flow Control --*/
-#ifdef NETWORK_XBEE
-	//#define XBEE_FLOWCTL_CRTSCTS
-#endif
+
+//#define XBEE_FLOWCTL_CRTSCTS
 
 /*======================================
  *      LED PIN No of Arduino
@@ -64,7 +63,7 @@
  *         Debug Flag
  ======================================*/
 #define DEBUG_NW
-//#define DEBUG_MQTTSN
+#define DEBUG_MQTTSN
 
 /****************************************
       MQTT-SN Parameters
