@@ -26,10 +26,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
  */
 
 #ifdef ARDUINO

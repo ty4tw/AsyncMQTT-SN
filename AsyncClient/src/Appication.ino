@@ -27,22 +27,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifdef ARDUINO
-#include <lib/MqttsnClientApp.h>
-#include <lib/MqttsnClient.h>
-#include <SPI.h>
-#include <Ethernet.h>
-#include <EthernetUdp.h>
-#else
-#include "lib/MqttsnClientApp.h"
-#include "lib/MqttsnClient.h"
-#endif
-
-#if defined(ARDUINO) && (defined(DEBUG_NW) || defined(DEBUG_MQTTSN) || defined(DEBUG))
-#include <SoftwareSerial.h>
-SoftwareSerial debug(8, 9);
-#endif
-
+#include <MqttsnClientApp.h>
+#include <MqttsnClient.h>
 using namespace std;
 using namespace tomyAsyncClient;
 extern MqttsnClient* theClient;
@@ -52,11 +38,10 @@ extern MqttsnClient* theClient;
  *      MQTT-SN Client Application
  *
  *===========================================*/
- #ifdef NETWORK_XBEE
  XBEE_APP_CONFIG = {
     {
-    	"client01",     //ClientId
-		57600,          //Baudrate
+        "clientFio01",     //ClientId
+        57600,          //Baudrate
         0,              //Serial PortNo (for Arduino App)
         "/dev/ttyUSB0"               //Device (for linux App)
     },
@@ -68,27 +53,6 @@ extern MqttsnClient* theClient;
         "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
     }
  };
-#endif
-
-#ifdef NETWORK_UDP
-UDP_APP_CONFIG = {
-    {
-      	"LinuxClient",      //ClientId
-        {225,1,1,1},        // Multicast group IP
-        1883,               // Multicast group Port
-        {0,0,0,0},          // Local IP     (for Arduino App)
-        12001,              // Local PortNo
-        {0,0,0,0,0,0}       // MAC address  (for Arduino App)
-    },
-    {
-        300,            //KeepAlive
-        true,           //Clean session
-        false,          //EndDevice
-        "willTopic",    //WillTopic   or 0   DO NOT USE NULL STRING "" !
-        "willMessage"   //WillMessage or 0   DO NOT USE NULL STRING "" !
-    }
-};
-#endif
 
 /*------------------------------------------------------
  *             Create Topic
@@ -103,21 +67,21 @@ static bool onoffFlg = true;
 
 void task1(void){
   printf("TASK1 invoked\n");
-  Payload* pl = new Payload(10);
+  tomyAsyncClient::Payload* pl = new Payload(10);
   onoffFlg = !onoffFlg;
   pl->set_bool(onoffFlg);
   PUBLISH(topic2,pl,1);
 }
 
 void task2(void){
-  printf("TASK2 invoked\n");
+  
 }
 
 /*---------------  List of task invoked by Timer ------------*/
 
-TASK_LIST = {  // ex. TASK( const char* topic, executing duration in second),
-             TASK(task1,1),
-             TASK(task2,5),
+TASK_LIST = {  //TASK( const char* topic, executing duration in second),
+             TASK(task1,3),
+             TASK(task2,20),
              END_OF_TASK_LIST
             };
 
@@ -125,14 +89,15 @@ TASK_LIST = {  // ex. TASK( const char* topic, executing duration in second),
  *       Tasks invoked by PUBLISH command Packet
  *------------------------------------------------------*/
 
-int on_publish(Payload* payload){
-    INDICATOR_ON(payload->get_bool(0));
+int on_publish(tomyAsyncClient::Payload* pload){
+    //printf("ON_PUBLISH invoked.  ");
+    INDICATOR_ON(pload->get_bool(0));
     return 0;
 }
 
 /*------------ Link Callback to Topic -------------*/
 
-SUBSCRIBE_LIST = { // ex. SUB(topic, callback, QoS=0or1),
+SUBSCRIBE_LIST = {//SUB(topic, callback, QoS=0or1),
                   SUB(topic2, on_publish, 1),
                   END_OF_SUBSCRIBE_LIST
                  };

@@ -26,10 +26,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
  */
 
 #ifdef ARDUINO
@@ -481,15 +477,17 @@ uint8_t Network::send(const uint8_t* payload, uint8_t pLen, uint8_t unicast){
     D_NWALN();
     D_NWL("\r\n");
 
-    if ( readApiFrame(4000) == 2 )  // expect Xmit status message while 4 secs
-    {
-    	return 1;
-    }
-    else
-    {
-    	D_NWA(F("XmitStatus Timeout\r\n"));
-		D_NWL("XmitStatus Timeout\r\n");
-    	return 0;
+    if (unicast){
+		if ( readApiFrame(4000) == 2 )  // expect Xmit status message while 4 secs
+		{
+			return 1;
+		}
+		else
+		{
+			D_NWA(F("XmitStatus Timeout\r\n"));
+			D_NWL("XmitStatus Timeout\r\n");
+			return 0;
+		}
     }
 }
 

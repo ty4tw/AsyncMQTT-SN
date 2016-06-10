@@ -26,10 +26,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  Created on: 2015/04/19
- *    Modified: 2015/05/16
- *      Author: tomoaki
- *     Version: 0.1.0
  */
 
 #ifndef ARDUINO
@@ -218,7 +214,6 @@ void PublishManager::responce(const uint8_t* msg, uint16_t msglen){
 }
 
 void PublishManager::published(uint8_t* msg, uint16_t msglen){
-    // QoS2 is not supported
     if (msg[1] & MQTTSN_FLAG_QOS_1){
         sendPubAck(getUint16(msg + 2), getUint16(msg + 4), MQTTSN_RC_ACCEPTED);
     }

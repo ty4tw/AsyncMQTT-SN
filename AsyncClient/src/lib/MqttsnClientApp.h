@@ -26,8 +26,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  Created on: 2015/04/19
- *      Author: Tomoaki, YAMAGUCHI
  */
 
 #ifndef MQTTSNCLIENTAPP_H_
@@ -57,7 +55,7 @@
 /*======================================
  *      LED PIN No of Arduino
  ======================================*/
-#define ARDUINO_LED_PIN   9
+#define ARDUINO_LED_PIN   13
 
 /*======================================
  *         Debug Flag
@@ -82,7 +80,7 @@
 #define MQTTSN_DEFAULT_DURATION    900     // 15min
 #define MQTTSN_TIME_SEARCHGW         3
 #define MQTTSN_TIME_RETRY           10
-#define MQTTSN_RETRY_COUNT           5
+#define MQTTSN_RETRY_COUNT           3
 
 /****************************************
             Platform
